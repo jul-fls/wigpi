@@ -1,0 +1,5 @@
+lundi : bg-green-500
+mardi : bg-blue-400
+mercredi : bg-orange-400
+jeudi : bg-red-700
+vendredi : bg-pink-600

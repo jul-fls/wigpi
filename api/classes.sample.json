@@ -1,0 +1,25 @@
+[{
+        "name": "class1",
+        "displayname": "Classe 1",
+        "roleid": "discord role id 1",
+        "webhookid": "discord webhook id 1",
+        "webhooktoken": "discord webhook token 1",
+        "username": "username of a class1 student in wigor db"
+    },
+    {
+        "name": "class2",
+        "displayname": "Classe 2",
+        "roleid": "discord role id 2",
+        "webhookid": "discord webhook id 2",
+        "webhooktoken": "discord webhook token 2",
+        "username": "username of a class2 student in wigor db"
+    },
+    {
+        "name": "class3",
+        "displayname": "Classe 3",
+        "roleid": "discord role id 3",
+        "webhookid": "discord webhook id 3",
+        "webhooktoken": "discord webhook token 3",
+        "username": "username of a class3 student in wigor db"
+    }
+]
