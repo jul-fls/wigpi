@@ -8,6 +8,8 @@ async function parseHTMLForWeek(response, date) {
     if ($('body').text().includes(process.env.WIGOR_NO_COURSE_TEXT)) {
         console.log("Pas de cours la semaine du " + date + " !");
     } else {
+        //remove all the img tags that have the class "IMG_Warning"
+        $("img.IMG_Warning").remove();
         $cours_week_raw = $(".Case:not([id])");
         $cours_week = $cours_week_raw.toArray();
         $cleaned_cours_week = [];
@@ -27,20 +29,20 @@ async function parseHTMLForWeek(response, date) {
                 cours.lien_teams = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href").split("&Tel=")[0];
             }
             cours.position = parseInt($cours_week[$i].attribs.style.split("left:")[1].split("%")[0]);
-            switch (cours.position) {
-                case parseInt(process.env.MONDAY_LEFT):
+            switch (true) {
+                case cours.position >= parseInt(process.env.MONDAY_LEFT) && cours.position < parseInt(process.env.TUESDAY_LEFT):
                     cours.jour = 0;
                     break;
-                case parseInt(process.env.TUESDAY_LEFT):
+                case cours.position >= parseInt(process.env.TUESDAY_LEFT) && cours.position < parseInt(process.env.WEDNESDAY_LEFT):
                     cours.jour = 1;
                     break;
-                case parseInt(process.env.WEDNESDAY_LEFT):
+                case cours.position >= parseInt(process.env.WEDNESDAY_LEFT) && cours.position < parseInt(process.env.THURSDAY_LEFT):
                     cours.jour = 2;
                     break;
-                case parseInt(process.env.THURSDAY_LEFT):
+                case cours.position >= parseInt(process.env.THURSDAY_LEFT) && cours.position < parseInt(process.env.FRIDAY_LEFT):
                     cours.jour = 3;
                     break;
-                case parseInt(process.env.FRIDAY_LEFT):
+                case cours.position >= parseInt(process.env.FRIDAY_LEFT):
                     cours.jour = 4;
                     break;
                 default:
