@@ -49,7 +49,19 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
         document.querySelector("#vendredi").innerHTML = "Vendredi " + friday_date_str;
         tbody = document.querySelector("tbody");
         $horaires = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
-
+        
+        function removeDuplicates(arr) {
+            //if there is more than one cours for the same hour and day, keep only the first one
+            var unique_array = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (unique_array.indexOf(arr[i]) == -1) {
+                    unique_array.push(arr[i]);
+                }
+            }
+            return unique_array;
+        }
+        $cours = removeDuplicates($cours);
+        
         function getCoursHours(cours_of_the_week) {
             var holes = [];
             for (var i = 0; i < cours_of_the_week.length; i++) {
@@ -74,6 +86,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
             }
             return holes;
         }
+        
         function getHoles(cours_of_the_week) {
             var holes = [];
             var cours_hours = getCoursHours(cours_of_the_week);
