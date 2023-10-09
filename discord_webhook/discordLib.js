@@ -28,7 +28,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
     $date = $date[0] + "/" + $date[1] + "/" + $date[2];
 
     let chemin = path.join(process.env.ROOT_PATH + "pngFiles/", classname + ".png");
-    $random_str = "#" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    $random_str = "" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     $embeds = [];
 
     $embed = {
@@ -90,4 +90,4 @@ async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
 }
 module.exports = {
     post_edt
-};
+};};

@@ -1,7 +1,6 @@
 require('dotenv').config();
 const dt = require('./DateTimeLib.js');
 const parser = require('./Parser.js');
-var request = require('request');
 const fetch = (...args) =>
     import ('node-fetch').then(({ default: fetch }) => fetch(...args));
 var serverids = process.env.WIGOR_SERVER_IDS.split("");
