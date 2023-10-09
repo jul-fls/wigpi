@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
+var urlLib = require('./urlLib.js');
 async function parseHTMLForWeek(response, date) {
     const $ = cheerio.load(response);
     if ($('body').text().includes(process.env.WIGOR_NO_COURSE_TEXT)) {
@@ -25,9 +26,11 @@ async function parseHTMLForWeek(response, date) {
             if (cours.salle.startsWith("M: ")) {
                 cours.salle = cours.salle.replace("M: ", "");
             }
-            if($($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href") != undefined) {
-                cours.lien_teams = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href").split("&Tel=")[0];
-            }
+            // if ($($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href") != undefined) {
+            //     cours.lien_teams = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href").split("&Tel=")[0];
+            //     console.log("lien teams = "+cours.lien_teams);
+            //     cours.lien_teams = await urlLib.getMetaRefreshUrl(cours.lien_teams);
+            // }
             cours.position = parseInt($cours_week[$i].attribs.style.split("left:")[1].split("%")[0]);
             switch (true) {
                 case cours.position >= parseInt(process.env.MONDAY_LEFT) && cours.position < parseInt(process.env.TUESDAY_LEFT):
@@ -80,6 +83,11 @@ async function parseHTMLForWeek(response, date) {
             $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof;
             $cleaned_cours_week[$i].uid = crypto.createHash('md5').update($cleaned_cours_week[$i].uid).digest("hex");
         }
+        //remove all the cours that have "autonomie" in the matiere
+        $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
+            return !cours.matiere.toLowerCase().includes("autonomie");
+        });
+
         return $cleaned_cours_week;
     }
 }
