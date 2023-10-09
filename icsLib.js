@@ -60,9 +60,9 @@ function write(type,data,icsFileName){
         "SUMMARY:" + data.matiere + "\n" +
         "LOCATION:" + data.salle + "\n";
         if(data.lien_teams != undefined){
-            ics += "DESCRIPTION:" + data.prof +"\\nLien Teams : "+data.lien_teams+ "\n";
+            ics += "DESCRIPTION:Intervenant(e) : " + data.prof +"\\nLien Teams : "+data.lien_teams+ "\n";
         }else{
-            ics += "DESCRIPTION:" + data.prof + "\n";
+            ics += "DESCRIPTION:Intervenant(e) : " + data.prof + "\n";
         }
         ics += "END:VEVENT" + "\n";
         fs.appendFile(icsFileName, ics, function(err) {
