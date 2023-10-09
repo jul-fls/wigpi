@@ -37,11 +37,11 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
         "color": parseInt(process.env.DISCORD_EMBED_COLOR, 16),
         "timestamp": $refresh_date.toISOString(),
         "footer": {
-            "text": "EDT EPSI B3",
+            "text": "EDT EPSI I1",
             "icon_url": process.env.DISCORD_IMAGE
         },
         "image": {
-            "url": process.env.EXTERNAL_DOMAIN + "/api/get_png/" + classname + $random_str
+            "url": process.env.EXTERNAL_DOMAIN + "/api/get_png/" + classname + "/" + $random_str
         }
     };
     $embeds.push($embed);
@@ -90,4 +90,4 @@ async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
 }
 module.exports = {
     post_edt
-};};
+};
