@@ -1,14 +1,15 @@
 var fs = require('fs');
 
 function start(class_displayname) {
-    json = "[{\n";
+    json = "{\"info\":{\n";
+    json += "\"timestamp\": \"" + Date.now() + "\",\n";
     json += "\"classname\": \"" + class_displayname + "\",\n";
-    json += "\"description\": \"Emploi du temps des cours des " + class_displayname + "\"\n},{\"courses\": [\n";
+    json += "\"description\": \"Emploi du temps des cours des " + class_displayname + "\"\n},\"courses\": [\n";
     return json;
 }
 
 function end() {
-    json = "\n]}\n]";
+    json = "\n]\n}";
     return json;
 }
 
@@ -41,6 +42,8 @@ function write(type, data, jsonFileName) {
         json += "\"matiere\": \"" + data.matiere + "\",\n";
         json += "\"prof\": \"" + data.prof + "\",\n";
         json += "\"salle\": \"" + data.salle + "\",\n";
+        json += "\"batiment\": \"" + data.batiment + "\",\n";
+        json += "\"visio\": \"" + data.visio + "\",\n";
         if (data.lien_teams != undefined) {
             json += "\"teamslink\": \"" + data.lien_teams + "\"\n";
         } else {

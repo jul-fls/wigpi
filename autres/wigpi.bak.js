@@ -5,7 +5,7 @@ var fs = require('fs');
 
 //make a get request
 $base_url = "https://edtmobiliteng.wigorservices.net/WebPsDyn.aspx?action=posEDTBEECOME&serverid=i";
-$user = "username";
+$user = "julien.flusin";
 $date = "10/03/2022";
 
 //if date is not monday, find it

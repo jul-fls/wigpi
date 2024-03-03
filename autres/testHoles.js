@@ -159,7 +159,7 @@ function createFakeCours(cours_of_the_week){
 async function main() {
     var serverids = process.env.WIGOR_SERVER_IDS.split("");
     base_url = "https://edtmobiliteng.wigorservices.net/WebPsDyn.aspx?action=posEDTBEECOME";
-    user = "username";
+    user = "julien.flusin";
     //choose random server
     serverid = serverids[Math.floor(Math.random() * serverids.length)];
     date = "10/17/2022";
