@@ -17,7 +17,7 @@
       "text/calendar"
     ],
     "paths": {
-      "/get_json/get_classes": {
+      "/classes/get_json": {
         "get": {
           "summary": "GET /get_classes",
           "operationId": "ListClasses",
@@ -34,7 +34,7 @@
           ]
         }
       },
-      "/get_json/{class_name}": {
+      "/courses/get_json/{class_name}": {
         "get": {
           "summary": "GET /get_json/{class_name}",
             "operationId": "ListCoursesForClass",
@@ -63,7 +63,7 @@
                 "Generic"
             ]
         },
-        "/get_png/{class_name}/{randomString}": {
+        "/courses/get_png/{class_name}/{randomString}": {
             "get": {
                 "summary": "GET /get_png/{class_name}/{randomString}",
                 "operationId": "GetPngForClass",

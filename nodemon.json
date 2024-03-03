@@ -1,0 +1,5 @@
+{
+    "watch": ["api/"],
+    "ext": "js,json",
+    "exec": "pm2 restart wigpi_api"
+}
