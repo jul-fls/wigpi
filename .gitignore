@@ -1,2 +1,11 @@
 .env
+node_modules/
+htmlFiles/
+jsonFiles/
+icsFiles/
+pngFiles/
+hashFiles/
+messageIds/
+servers/
+logs/
 api/classes.json
