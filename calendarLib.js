@@ -1,4 +1,7 @@
 require('dotenv').config();
+var fs = require('fs');
+var path = require('path');
+var crypto = require('crypto');
 const dt = require('./DateTimeLib.js');
 const parser = require('./Parser.js');
 const fetch = (...args) =>
@@ -38,6 +41,13 @@ async function getCalendarForWeek(base_url, serverid, user, date) {
             setTimeout(function() { getCalendarForWeek(base_url, serverid, user, date) }, 2000);
         });
     console.log("Getting calendar for week " + date + ", url : " + url);
+    //save html file to "debugHTMLFiles" folder
+    // fs.writeFile(path.join(__dirname, 'debugHTMLFiles', crypto.createHash('md5').update(url).digest('hex') + '.html'), $body, function(err) {
+    //     if (err) {
+    //         return console.log(err);
+    //     }
+    //     console.log("The debugHTML file was saved!");
+    // });
     return await parser.parseHTMLForWeek($body, date);
 }
 

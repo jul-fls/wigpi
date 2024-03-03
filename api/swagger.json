@@ -1,0 +1,233 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "WIGPI API",
+      "version": "1.0.0"
+    },
+    "schemes": [
+      "https"
+    ],
+    "host": "wigpi.flusin.fr",
+    "basePath": "/api",
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json",
+      "text/calendar"
+    ],
+    "paths": {
+      "/get_json/get_classes": {
+        "get": {
+          "summary": "GET /get_classes",
+          "operationId": "ListClasses",
+          "responses": {
+            "200": {
+              "description": "",
+              "schema": {
+                "$ref": "#/definitions/JsonListClassesRequest"
+              }
+            }
+          },
+          "tags": [
+            "Generic"
+          ]
+        }
+      },
+      "/get_json/{class_name}": {
+        "get": {
+          "summary": "GET /get_json/{class_name}",
+            "operationId": "ListCoursesForClass",
+            "parameters": [
+              {
+                "name": "class_name",
+                "in": "path",
+                "required": true,
+                "type": "string",
+                "format": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "",
+                "schema": {
+                  "$ref": "#/definitions/JsonListCoursesForClass"
+                }
+              }
+            },
+            "tags": [
+              "Generic"
+            ]
+          },
+            "tags": [
+                "Generic"
+            ]
+        },
+        "/get_png/{class_name}/{randomString}": {
+            "get": {
+                "summary": "GET /get_png/{class_name}/{randomString}",
+                "operationId": "GetPngForClass",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    {
+                        "name": "randomString",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "format": "string",
+                        "description": "A random string to avoid caching"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Generic"
+                ]
+            }
+        },
+        "/get_ics/{class_name}": {
+            "get": {
+                "summary": "GET /get_ics/{class_name}/{randomString}",
+                "operationId": "GetIcsForClass",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ICS File",
+                        "content": {
+                            "text/calendar": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Generic"
+                ]
+            }
+        }
+    },
+    "definitions": {
+      "JsonClass": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "format": "string"
+          },
+          "displayname": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+      },
+      "JsonListClassesRequest": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/JsonClass"
+            }
+          }
+        },
+        "description": "Represents a list of classes"
+      },
+      "JsonListCoursesForClass": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "$ref": "#/definitions/JsonCoursesFileInfo"
+          }
+        },
+        "description": "Represents a list of courses for a class"
+      },
+      "JsonCoursesFileInfo": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "unix_timestamp"
+          },
+          "classname: ": {
+            "type": "string",
+            "format": "string"
+          },
+          "description": {
+            "type": "string",
+            "format": "string"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/JsonCourseInfo"
+            }
+          }
+        },
+        "description": "Represents a list of courses"
+      },
+      "JsonCourseInfo": {
+        "type": "object",
+        "properties": {
+          "dtstart": {
+            "type": "string",
+            "format": "string"
+          },
+            "dtend": {
+                "type": "string",
+                "format": "string"
+            },
+            "matiere": {
+                "type": "string",
+                "format": "string"
+            },
+            "prof": {
+                "type": "string",
+                "format": "string"
+            },
+            "salle": {
+                "type": "string",
+                "format": "string"
+            },
+            "batiment": {
+                "type": "string",
+                "format": "string"
+            },
+            "visio": {
+                "type": "boolean"
+            },
+            "teamslink": {
+                "type": "string",
+                "format": "string"
+            }
+        },
+        "description": "Represents a course"
+      }
+    }
+  }
