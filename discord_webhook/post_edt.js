@@ -12,13 +12,14 @@ async function main(class_name){
     $date.setDate($date.getDate() - $date.getDay() + 1);
     $date_str = ('0' + $date.getDate()).slice(-2) + "/" + ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + $date.getFullYear();
     $date_str_2 = ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + ('0' + $date.getDate()).slice(-2) + "/" + $date.getFullYear();
+    console.log($date_str_2)
     var serverids = process.env.WIGOR_SERVER_IDS.split("");
     base_url = process.env.WIGOR_BASE_URL;
     serverid = serverids[Math.floor(Math.random() * serverids.length)];
     await cal.getCalendarForWeek(base_url, serverid, class_name.username, $date_str_2)
         .then(async(cours_of_the_week) => {
             //if there is courses
-            if (cours_of_the_week != undefined) {
+            if (cours_of_the_week && cours_of_the_week.length > 0) {
                 await htmlLib.GenerateHTML(class_name.name, $date_str_2, cours_of_the_week)
                     .then(async (result) => {
                         console.log("HTML generated for " + class_name.name);

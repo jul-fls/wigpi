@@ -68,6 +68,8 @@ async function getCoursForAllClasses() {
         console.log("[LOG CREATE JSON][" + $date_str + "] Fin de la classe " + $classes[i].name);
     }
 
+    // sleep for 10 seconds
+    await new Promise(r => setTimeout(r, 10000));
     // move the tmp files to the final ones
     let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "icsFiles/");
     let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "jsonFiles/");
