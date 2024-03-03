@@ -20,10 +20,10 @@ async function getCoursForYear(year, user) {
         });
 }
 async function getCoursForClass(username, classname, displayname) {
-    icsFileName = process.env.ROOT_PATH + "icsFiles/" + classname + ".ics.tmp";
-    jsonFileName = process.env.ROOT_PATH + "jsonFiles/" + classname + ".json.tmp";
+    icsFileName = process.env.ROOT_PATH + "icsFiles/" + classname + ".ics";
+    jsonFileName = process.env.ROOT_PATH + "jsonFiles/" + classname + ".json";
     hashFileName = process.env.ROOT_PATH + "hashFiles/" + classname + ".md5";
-    actualYear = (new Date().getFullYear())-1;
+    actualYear = new Date().getFullYear();
     nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
     json.write("start", displayname, jsonFileName);
@@ -38,6 +38,7 @@ async function getCoursForClass(username, classname, displayname) {
         .then(async() => {
             ics.write("end", null, icsFileName);
             json.write("end", null, jsonFileName);
+            await createHashFile(jsonFileName, hashFileName);
             console.log("Done writing ics file for class " + classname);
             console.log("Done writing json file for class " + classname);
         })
@@ -67,33 +68,5 @@ async function getCoursForAllClasses() {
         console.log("[LOG CREATE ICS][" + $date_str + "] Fin de la classe " + $classes[i].name);
         console.log("[LOG CREATE JSON][" + $date_str + "] Fin de la classe " + $classes[i].name);
     }
-
-    // move the tmp files to the final ones
-    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "icsFiles/");
-    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "jsonFiles/");
-    for (let i = 0; i < $icsFiles.length; i++) {
-        if ($icsFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i], process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i].replace(".tmp", ""), (err) => {
-                if (err) throw err;
-                console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
-            });
-        }
-    }
-    for (let i = 0; i < $jsonFiles.length; i++) {
-        if ($jsonFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i], process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i].replace(".tmp", ""), (err) => {
-                if (err) throw err;
-                console.log("Done writing json file for class " + $jsonFiles[i].replace(".tmp", ""));
-            });
-        }
-    }
-    for (let i = 0; i < $jsonFiles.length; i++) {
-        // create hash files
-        if ($jsonFiles[i].includes(".json")) {
-            await createHashFile(process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i], process.env.ROOT_PATH + "hashFiles/" + $jsonFiles[i].replace(".json", ".md5"));
-        }
-    }
-    console.log("Done writing ics file for all classes");
-    console.log("Done writing json file for all classes");
 }
 getCoursForAllClasses();

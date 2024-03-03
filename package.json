@@ -8,7 +8,6 @@
     "fs": "^0.0.1-security",
     "puppeteer": "^18.0.5",
     "request": "^2.88.2",
-    "simple-discord-webhooks": "^2.1.0",
-    "swagger-ui-express": "^5.0.0"
+    "simple-discord-webhooks": "^2.1.0"
   }
 }

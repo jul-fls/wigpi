@@ -1,8 +1,8 @@
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
     host: '127.0.0.1',
-    user: 'julien', 
-    password: 'W5OVsJ2aXTWckO0',
+    user: 'username', 
+    password: 'password',
     connectionLimit: 100,
     database: 'wigpi',
     rowsAsArray: true

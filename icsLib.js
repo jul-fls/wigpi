@@ -33,10 +33,10 @@ function end(){
     // console.log("end");
     return ics;
 }
-async function write(type,data,icsFileName){
+function write(type,data,icsFileName){
     if(type == "start"){
         ics = start(data);
-        await fs.writeFile(icsFileName, ics, function(err) {
+        fs.writeFile(icsFileName, ics, function(err) {
             if(err) {
                 return err;
             }
@@ -58,7 +58,7 @@ async function write(type,data,icsFileName){
         "DTSTART;" + tzid + data.dtstart + "\n" +
         "DTEND;" + tzid + data.dtend + "\n" +
         "SUMMARY:" + data.matiere + "\n" +
-        "LOCATION:" + (data.batiment != "Visio" ? "Batiment : " + data.batiment + " Salle : " + data.salle : "Visio") + "\n";
+        "LOCATION:" + data.salle + "\n";
         if(data.lien_teams != undefined){
             ics += "DESCRIPTION:Intervenant(e) : " + data.prof +"\\nLien Teams : "+data.lien_teams+ "\n";
         }else{
