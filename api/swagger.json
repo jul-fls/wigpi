@@ -13,8 +13,7 @@
       "application/json"
     ],
     "produces": [
-      "application/json",
-      "text/calendar"
+      "application/json"
     ],
     "paths": {
       "/classes/get_json": {
