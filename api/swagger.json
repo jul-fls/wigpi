@@ -144,7 +144,8 @@
             "type": "string",
             "format": "string"
           }
-        }
+        },
+        "description": "Represents a class"
       },
       "JsonListClassesRequest": {
         "type": "object",
