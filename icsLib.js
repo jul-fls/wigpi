@@ -65,7 +65,7 @@ async function write(type,data,icsFileName){
         }
         if(data.prof && data.prof != ""){
             ics += "ATTENDEE;CN=\"" + data.prof.name + "\";ROLE=REQ-PARTICIPANT:mailto:" + data.prof.email + "\n";
-            ics += "ORGANIZER;CN=\"EPSI\":mailto:epsi@example.com\n";
+            ics += "ORGANIZER;CN=\"" + data.prof.name + "\":mailto:epsi@example.com\n";
         }
         ics += "BEGIN:VALARM" + "\n" +
         "TRIGGER:-PT15M" + "\n" +
