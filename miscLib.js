@@ -6,6 +6,7 @@ function EpsiNameToEmail(name) {
     if (name.length < 5 || !name) {
         return "";
     }
+    const max_characters_threshold = 20;
     const mailDomains = {
         "@mail-formateur.net": [],
         "@reseau-cd.fr": ["guerineau", "hivert", "sauvage"],
@@ -14,8 +15,9 @@ function EpsiNameToEmail(name) {
     };
     const predeterminedEmails = {
         // Pattern: "part of name": "predetermined email"
-        "graffin": "marie-sophie.graffin@bordeaux-epsi.fr"
-        // Add other exceptions here as needed
+        "graffin": "marie-sophie.graffin@bordeaux-epsi.fr",
+        "toix": "florian.toix1@mail-formateur.net",
+        "ladrat": "geoffroy.ladrat1@mail-formateur.net"
     };
 
     let emailParts = name.split(" ");
@@ -40,15 +42,18 @@ function EpsiNameToEmail(name) {
     });
 
     let profEmail;
-    if (lastNameParts.length === 1 && (firstName+"."+lastName).length<22) {
+    if (lastNameParts.length === 1 && (firstName+"."+lastName).length<max_characters_threshold) {
         // If there's only one part in the last name
         profEmail = `${firstName}.${lastName}${mailDomain}`;
-    } else if(lastNameParts.length === 1 && (firstName+"."+lastName).length>=22){
+    } else if(lastNameParts.length === 1 && (firstName+"."+lastName).length>=max_characters_threshold){
         // If the last name has two or three parts
         profEmail = `${firstName.charAt(0)}.${lastName}${mailDomain}`;
-    } else if(lastNameParts.length === 2){
+    } else if(lastNameParts.length === 2 && (firstName+"."+lastName).length<max_characters_threshold){
         // If the last name has two or three parts
         profEmail = `${firstName}.${lastName}${mailDomain}`;
+    } else if(lastNameParts.length === 2 && (firstName+"."+lastName).length>=max_characters_threshold){
+        // If the last name has two or three parts
+        profEmail = `${lastNameParts[1].charAt(0)}.${lastNameParts[0]}${mailDomain}`;
     } else if(lastNameParts.length >= 3){
         profEmail = `${lastNameParts[1].charAt(0)}.${lastNameParts[0]}${mailDomain}`;
     }else{
