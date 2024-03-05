@@ -207,8 +207,18 @@
                 "format": "string"
             },
             "prof": {
-                "type": "string",
-                "format": "string"
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "format": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "string"
+                    }
+                },
+                "description": "Represents a teacher"
             },
             "salle": {
                 "type": "string",

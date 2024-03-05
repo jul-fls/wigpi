@@ -40,7 +40,7 @@ function write(type, data, jsonFileName) {
         json += "\"dtstart\": \"" + data.dtstart + "\",\n";
         json += "\"dtend\": \"" + data.dtend + "\",\n";
         json += "\"matiere\": \"" + data.matiere + "\",\n";
-        json += "\"prof\": \"" + data.prof + "\",\n";
+        json += "\"prof\": {\"name\":\"" + data.prof.name + "\",\"email\":\"" + data.prof.email + "\"},\n";
         json += "\"salle\": \"" + data.salle + "\",\n";
         json += "\"batiment\": \"" + data.batiment + "\",\n";
         json += "\"visio\": \"" + data.visio + "\",\n";

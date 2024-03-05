@@ -1,4 +1,5 @@
 var fs = require('fs');
+
 function start(class_displayname){
     timezone = "BEGIN:VTIMEZONE\n";
     timezone += "TZID:Europe/Paris\n";
@@ -60,10 +61,17 @@ async function write(type,data,icsFileName){
         "SUMMARY:" + data.matiere + "\n" +
         "LOCATION:" + (data.batiment != "Visio" ? "Batiment : " + data.batiment + " Salle : " + data.salle : "Visio") + "\n";
         if(data.lien_teams != undefined){
-            ics += "DESCRIPTION:Intervenant(e) : " + data.prof +"\\nLien Teams : "+data.lien_teams+ "\n";
-        }else{
-            ics += "DESCRIPTION:Intervenant(e) : " + data.prof + "\n";
+            ics += "URL:" + data.lien_teams + "\n";
         }
+        if(data.prof && data.prof != ""){
+            ics += "ATTENDEE;CN=\"" + data.prof.name + "\";ROLE=REQ-PARTICIPANT:mailto:" + data.prof.email + "\n";
+            // ics += "ORGANIZER;CN=\""+data.prof.name+"\":mailto:"+data.prof.email+"\n";
+        }
+        ics += "BEGIN:VALARM" + "\n" +
+        "TRIGGER:-PT15M" + "\n" +
+        "ACTION:DISPLAY" + "\n" +
+        "DESCRIPTION:Reminder" + "\n" +
+        "END:VALARM" + "\n";
         ics += "END:VEVENT" + "\n";
         fs.appendFile(icsFileName, ics, function(err) {
             if(err) {
