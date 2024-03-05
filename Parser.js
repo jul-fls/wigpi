@@ -46,7 +46,7 @@ async function parseHTMLForWeek(response, date) {
                         if (cours.batiment === "DISTANCIEL") {
                             cours.visio = true;
                             cours.batiment = "VISIO";
-                            cours.salle = "DISTANCIEL";
+                            cours.salle = "VISIO";
                         }
                     }
                 }
@@ -56,6 +56,9 @@ async function parseHTMLForWeek(response, date) {
                 }
                 if (cours.salle.startsWith("F")) {
                     cours.salle = cours.salle.replace("F", "");
+                }
+                if(cours.salle.includes("SALLE_")){
+                    cours.salle = "VISIO";
                 }
             }
             
@@ -102,7 +105,7 @@ async function parseHTMLForWeek(response, date) {
         });
         for ($i = 0; $i < $cleaned_cours_week.length; $i++) {
             if ($i + 1 < $cleaned_cours_week.length) {
-                if ($cleaned_cours_week[$i].heure_fin === $cleaned_cours_week[$i + 1].heure_debut && $cleaned_cours_week[$i].salle === $cleaned_cours_week[$i + 1].salle && $cleaned_cours_week[$i].prof === $cleaned_cours_week[$i + 1].prof && $cleaned_cours_week[$i].viso === $cleaned_cours_week[$i + 1].viso && $cleaned_cours_week[$i].batiment === $cleaned_cours_week[$i + 1].batiment) {
+                if ($cleaned_cours_week[$i].heure_fin == $cleaned_cours_week[$i + 1].heure_debut && $cleaned_cours_week[$i].salle == $cleaned_cours_week[$i + 1].salle && $cleaned_cours_week[$i].prof.name == $cleaned_cours_week[$i + 1].prof.name && $cleaned_cours_week[$i].viso == $cleaned_cours_week[$i + 1].viso && $cleaned_cours_week[$i].batiment == $cleaned_cours_week[$i + 1].batiment) {
                     $cleaned_cours_week[$i].heure_fin = $cleaned_cours_week[$i + 1].heure_fin;
                     $cleaned_cours_week[$i].horaires = $cleaned_cours_week[$i].heure_debut + " - " + $cleaned_cours_week[$i].heure_fin;
                     $cleaned_cours_week[$i].dtend = $cleaned_cours_week[$i + 1].dtend;
@@ -112,7 +115,7 @@ async function parseHTMLForWeek(response, date) {
         }
         //create uid for each cours
         for ($i = 0; $i < $cleaned_cours_week.length; $i++) {
-            $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof;
+            $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof.name;
             $cleaned_cours_week[$i].uid = crypto.createHash('md5').update($cleaned_cours_week[$i].uid).digest("hex");
         }
         //remove all the cours that have "autonomie" in the matiere
