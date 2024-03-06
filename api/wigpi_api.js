@@ -15,12 +15,14 @@ const coursesRouteGetIcs = require('./routes/courses/get_ics');
 const coursesRouteGetJson = require('./routes/courses/get_json');
 const coursesRouteGetPng = require('./routes/courses/get_png');
 const dataRouteCoursesData = require('./routes/data/courses_data');
+const teachersRouteCheckIfEmailExists = require('./routes/teachers/check_if_email_exists');
 
 app.use('/api/classes/get_json', classesRouteGetJson);
 app.use('/api/get_ics', coursesRouteGetIcs);
 app.use('/api/courses/get_json', coursesRouteGetJson);
 app.use('/api/courses/get_png', coursesRouteGetPng);
 app.use('/api/data/courses_data', dataRouteCoursesData);
+app.use('/api/teachers/check_if_email_exists', teachersRouteCheckIfEmailExists);
 
 //create a route '/' for the home page which will render the index.html file and fill it with the classes.json file
 app.get('/', (req, res) => {

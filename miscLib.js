@@ -81,7 +81,7 @@ async function check_if_o365_user_exists(email){
         body: JSON.stringify(body)
     });
     const data = await response.json();
-    return data.IfExistsResult;
+    return !data.IfExistsResult;
 }
 
 module.exports = {

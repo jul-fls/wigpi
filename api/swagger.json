@@ -130,7 +130,33 @@
                     "Generic"
                 ]
             }
-        }
+        },
+        "/teachers/check_if_email_exists/{email}": {
+          "get": {
+              "summary": "GET /check_if_email_exists/{email}",
+              "operationId": "CheckIfEmailExists",
+              "parameters": [
+                  {
+                      "name": "email",
+                      "in": "path",
+                      "required": true,
+                      "type": "string",
+                      "format": "string"
+                  }
+              ],
+              "responses": {
+                  "200": {
+                      "description": "True if the email exists, false otherwise",
+                      "schema": {
+                        "$ref": "#/definitions/JsonCheckIfEmailExists"
+                      }
+                    }
+                  },
+              "tags": [
+                  "Generic"
+              ]
+          }
+      }
     },
     "definitions": {
       "JsonClass": {
@@ -158,6 +184,15 @@
           }
         },
         "description": "Represents a list of classes"
+      },
+      "JsonCheckIfEmailExists": {
+        "type": "object",
+        "properties": {
+          "exists": {
+            "type": "boolean"
+          }
+        },
+        "description": "Represents a check if email exists"
       },
       "JsonListCoursesForClass": {
         "type": "object",
