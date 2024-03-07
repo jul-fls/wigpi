@@ -14,7 +14,7 @@ const classesRouteGetJson = require('./routes/classes/get_json');
 const coursesRouteGetIcs = require('./routes/courses/get_ics');
 const coursesRouteGetJson = require('./routes/courses/get_json');
 const coursesRouteGetPng = require('./routes/courses/get_png');
-const dataRouteCoursesData = require('./routes/data/courses_data');
+const dataRouteCoursesData = require('./routes/data/courses_data_api');
 const teachersRouteCheckIfEmailExists = require('./routes/teachers/check_if_email_exists');
 
 app.use('/api/classes/get_json', classesRouteGetJson);

@@ -131,6 +131,32 @@
                 ]
             }
         },
+        "/data/courses_data/{class_name}": {
+            "get": {
+                "summary": "GET /courses_data/{class_name}",
+                "operationId": "GetCoursesDataForClass",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get the courses data with stats for a class",
+                        "schema": {
+                          "$ref": "#/definitions/GetCoursesDataForClassRequest"
+                        }
+                      }
+                    },
+                "tags": [
+                    "Generic"
+                ]
+            }
+        },
         "/teachers/check_if_email_exists/{email}": {
           "get": {
               "summary": "GET /check_if_email_exists/{email}",
@@ -148,7 +174,7 @@
                   "200": {
                       "description": "True if the email exists, false otherwise",
                       "schema": {
-                        "$ref": "#/definitions/JsonCheckIfEmailExists"
+                        "$ref": "#/definitions/JsonCheckIfEmailExistsRequest"
                       }
                     }
                   },
@@ -185,7 +211,64 @@
         },
         "description": "Represents a list of classes"
       },
-      "JsonCheckIfEmailExists": {
+      "GetCoursesDataForClassRequest": {
+        "type": "array",
+            "items": {
+              "$ref": "#/definitions/GetCoursesDataForClassObject"
+            }
+      },
+      "GetCoursesDataForClassObject": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "string"
+          },
+          "firstDate": {
+            "type": "string",
+            "format": "string"
+          },
+          "lastDate": {
+            "type": "string",
+            "format": "string"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalHours": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "realizedHours": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "plannedHours": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "percentageOfCompletion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasVisio": {
+            "type": "boolean"
+          },
+          "percentageOfVisio": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "teachers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Teacher"
+            }
+          }
+        },
+        "description": "Represents a list of classes"
+      },
+      "JsonCheckIfEmailExistsRequest": {
         "type": "object",
         "properties": {
           "exists": {
