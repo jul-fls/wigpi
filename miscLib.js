@@ -1,6 +1,10 @@
 const fetch = (...args) =>
     import ('node-fetch').then(({ default: fetch }) => fetch(...args));
 
+function normalizeString(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function EpsiNameToEmail(name) {
     // if name is less than 5 characters or is empty, return an empty string
     if (name.length < 5 || !name) {
@@ -20,8 +24,12 @@ function EpsiNameToEmail(name) {
         "ladrat": "geoffroy.ladrat1@mail-formateur.net"
     };
 
+    // Normalize the name to remove accents
+    name = normalizeString(name);
+    name = name.toLowerCase().replace("epsi","");
+
     let emailParts = name.split(" ");
-    let firstName = emailParts.pop().toLowerCase(); // Always the last part
+    let firstName = emailParts.pop(); // Always the last part
     let lastNameParts = emailParts.map(part => part.replace(/-/g, "").toLowerCase());
     let lastName = lastNameParts.join('');
     let mailDomain = "@mail-formateur.net"; // Default domain
