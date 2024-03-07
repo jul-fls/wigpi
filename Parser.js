@@ -23,7 +23,7 @@ async function parseHTMLForWeek(response, date) {
             if (cours.matiere.includes("VISIO")) {
                 cours.visio = true;
             }
-            cours.matiere = cours.matiere.replace("VISIO","").trim();
+            cours.matiere = cours.matiere.replace("VISIO","").replace(".","").replace(","," ").trim();
             cours.prof = {
                 name: "",
                 email: ""
