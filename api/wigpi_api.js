@@ -37,7 +37,7 @@ const homepageRoute = require('./routes/front/homepage/index');
 const dataRouteCoursesDataFront = require('./routes/front/courses_data/courses_data_front');
 
 app.use('/', homepageRoute);
-app.use('/data/courses_data', dataRouteCoursesDataFront);
+app.use('/data/', dataRouteCoursesDataFront);
 //// FRONT-END ROUTES ////
 
 

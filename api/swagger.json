@@ -232,25 +232,46 @@
             "type": "string",
             "format": "string"
           },
-          "total": {
-            "type": "integer",
-            "format": "int64"
+          "sessions":{
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "realized": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "planned": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
           },
-          "totalHours": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "realizedHours": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "plannedHours": {
-            "type": "integer",
-            "format": "int64"
+          "hours": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "realized": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "planned": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
           },
           "percentageOfCompletion": {
             "type": "integer",
             "format": "int64"
+          },
+          "ongoing": {
+            "type": "boolean"
           },
           "hasVisio": {
             "type": "boolean"

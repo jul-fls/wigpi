@@ -29,7 +29,7 @@ function filterAndRenameCourses(courses) {
         let newCourse = { ...course, matiere: courseName, prof: { name: profName, email: course.prof.email } };
         processedCourses.push(newCourse);
     });
-    console.log("number courses =",processedCourses.length);
+    
     const dev_processedCourses = processedCourses.slice(0, 10);
     return processedCourses;
 }
@@ -61,29 +61,37 @@ router.get('/:class_name', async (req, res) => {
                             const endDateTime = parseDateTime(course.dtend);
                             const durationHours = endDateTime.diff(startDateTime, 'hours', true);
                             const isRealized = endDateTime.isBefore(now);
-                            const isVisio = course.visio === "true";
+                            const isVisio = course.visio;
                         
                             if (!subjectsSummary[subject]) {
                                 subjectsSummary[subject] = {
                                     firstDate: startDateTime,
                                     lastDate: endDateTime,
-                                    occurrences: 1,
-                                    totalHours: durationHours,
-                                    realizedHours: isRealized ? durationHours : 0,
-                                    plannedHours: isRealized ? 0 : durationHours,
+                                    sessions: {
+                                        total: 1,
+                                        realized: isRealized ? 1 : 0,
+                                        planned: isRealized ? 0 : 1
+                                    },
+                                    hours: {
+                                        total: durationHours,
+                                        realized: isRealized ? durationHours : 0,
+                                        planned: isRealized ? 0 : durationHours
+                                    },
                                     teachers: [{name: course.prof.name, email: course.prof.email}],
                                     hasVisio: isVisio,
                                     visioCount: isVisio ? 1 : 0
                                 };
                             } else {
                                 const subjectEntry = subjectsSummary[subject];
-                                subjectEntry.occurrences += 1;
-                                subjectEntry.totalHours += durationHours;
+                                subjectEntry.sessions.total += 1;
                                 if (isRealized) {
-                                    subjectEntry.realizedHours += durationHours;
+                                    subjectEntry.sessions.realized += 1;
+                                    subjectEntry.hours.realized += durationHours;
                                 } else {
-                                    subjectEntry.plannedHours += durationHours;
+                                    subjectEntry.sessions.planned += 1;
+                                    subjectEntry.hours.planned += durationHours;
                                 }
+                                subjectEntry.hours.total += durationHours;
                                 if (startDateTime.isBefore(subjectEntry.firstDate)) {
                                     subjectEntry.firstDate = startDateTime;
                                 }
@@ -105,17 +113,17 @@ router.get('/:class_name', async (req, res) => {
 
                         const summaryArray = Object.keys(subjectsSummary).map(key => {
                             const summary = subjectsSummary[key];
-                            const percentageOfCompletion = (summary.realizedHours / summary.totalHours) * 100;
-                            const percentageOfVisio = summary.hasVisio ? Math.floor((summary.visioCount / summary.occurrences) * 100) : 0;
+                            const percentageOfCompletion = (summary.hours.realized / summary.hours.total) * 100;
+                            const percentageOfVisio = summary.hasVisio ? Math.floor((summary.visioCount / summary.sessions.total) * 100) : 0;
+                            const ongoing = percentageOfCompletion < 100;
                             return {
                                 subject: key,
-                                firstDate: summary.firstDate.format(),
-                                lastDate: summary.lastDate.format(),
-                                occurrences: summary.occurrences,
-                                totalHours: summary.totalHours,
-                                realizedHours: summary.realizedHours,
-                                plannedHours: summary.plannedHours,
+                                firstDate: summary.firstDate.format("DD/MM/yyyy"),
+                                lastDate: summary.lastDate.format("DD/MM/yyyy"),
+                                sessions: summary.sessions,
+                                hours: summary.hours,
                                 percentageOfCompletion: Math.floor(percentageOfCompletion),
+                                ongoing: ongoing,
                                 teachers: removeObjectsWithEmptyStrings(summary.teachers),
                                 hasVisio: summary.hasVisio,
                                 percentageOfVisio: percentageOfVisio

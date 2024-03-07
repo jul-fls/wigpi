@@ -26,7 +26,7 @@ function EpsiNameToEmail(name) {
 
     // Normalize the name to remove accents
     name = normalizeString(name);
-    name = name.toLowerCase().replace("epsi","");
+    name = name.toLowerCase()
 
     let emailParts = name.split(" ");
     let firstName = emailParts.pop(); // Always the last part

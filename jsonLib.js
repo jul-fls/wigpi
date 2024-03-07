@@ -43,7 +43,7 @@ function write(type, data, jsonFileName) {
         json += "\"prof\": {\"name\":\"" + data.prof.name + "\",\"email\":\"" + data.prof.email + "\"},\n";
         json += "\"salle\": \"" + data.salle + "\",\n";
         json += "\"batiment\": \"" + data.batiment + "\",\n";
-        json += "\"visio\": \"" + data.visio + "\",\n";
+        json += "\"visio\": " + data.visio + ",\n";
         if (data.lien_teams != undefined) {
             json += "\"teamslink\": \"" + data.lien_teams + "\"\n";
         } else {
