@@ -227,6 +227,20 @@
         },
         "description": "Represents a list of courses"
       },
+      "Teacher": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "format": "string"
+            },
+            "email": {
+                "type": "string",
+                "format": "string"
+            }
+        },
+        "description": "Represents a teacher"
+      },
       "JsonCourseInfo": {
         "type": "object",
         "properties": {
@@ -243,18 +257,7 @@
                 "format": "string"
             },
             "prof": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "format": "string"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "string"
-                    }
-                },
-                "description": "Represents a teacher"
+              "$ref": "#/definitions/Teacher"
             },
             "salle": {
                 "type": "string",
