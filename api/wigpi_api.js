@@ -38,6 +38,7 @@ const dataRouteCoursesDataFront = require('./routes/front/courses_data/courses_d
 
 app.use('/', homepageRoute);
 app.use('/data/', dataRouteCoursesDataFront);
+app.use('/api/front/courses_data/public', express.static(path.join(__dirname, 'routes/front/courses_data/public')));
 //// FRONT-END ROUTES ////
 
 
