@@ -17,7 +17,7 @@
     <select class="w-full bg-white rounded-lg shadow p-3 mb-5" id="classSelect" onchange="refreshData(this.value)">
         <option disabled selected>Choisissez une classe</option>
     </select>
-    <div class="grid grid-cols-5 gap-4" id="dataContainer">
+    <div id="dataContainer" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         <!-- Data will be displayed here -->
     </div>
     <script src="/api/front/courses_data/public/js/script.js"></script>
