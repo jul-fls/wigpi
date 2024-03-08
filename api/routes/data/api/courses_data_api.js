@@ -30,6 +30,17 @@ function filterAndRenameCourses(courses) {
         processedCourses.push(newCourse);
     });
     
+    // Sort the processedCourses by start time in chronological order
+    processedCourses.sort((a, b) => moment(a.dtstart, "YYYYMMDDTHHmmss").diff(moment(b.dtstart, "YYYYMMDDTHHmmss")));
+    // Find the index of the first workshop module based on chronological order
+    const workshopIndex = processedCourses.findIndex(course => course.matiere.toLowerCase().includes("workshop"));
+
+    // If the workshop is found, filter to keep only the workshop and the modules after it
+    if (workshopIndex !== -1) {
+        processedCourses = processedCourses.slice(workshopIndex);
+    }
+
+
     const dev_processedCourses = processedCourses.slice(0, 10);
     return processedCourses;
 }
