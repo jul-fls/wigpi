@@ -29,8 +29,7 @@ async function parseHTMLForWeek(response, date) {
                 email: ""
             };
             cours.prof.name = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[0].replace(/(\r\n|\n|\r)/gm, " ").replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() });
-            console.log(cours.prof.name);
-            cours.prof.name = cours.prof.name.replace("epsi","").trim();
+            cours.prof.name = cours.prof.name.replace(/epsi/gi,"").trim();
             if(cours.prof.name != ""){
                 cours.prof.email = miscLib.EpsiNameToEmail(cours.prof.name);
             }
