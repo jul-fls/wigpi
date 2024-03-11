@@ -54,7 +54,7 @@ function refreshData(className) {
             dataContainer.innerHTML = ''; // Clear the container
             data.forEach(item => {
                 const module = document.createElement('div');
-                module.className = 'relative max-w-sm rounded-lg overflow-hidden shadow-lg bg-white m-4 p-6'; // Added 'relative' here
+                module.className = 'relative rounded-lg overflow-hidden shadow-lg bg-white m-4 p-6'; // Added 'relative' here
 
                 // Add the module name
                 const module_name = document.createElement('h1');
