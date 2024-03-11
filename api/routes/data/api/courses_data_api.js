@@ -73,7 +73,20 @@ router.get('/:class_name', async (req, res) => {
                             const durationHours = endDateTime.diff(startDateTime, 'hours', true);
                             const isRealized = endDateTime.isBefore(now);
                             const isVisio = course.visio;
+                            const sessionStatus = getSessionStatus(startDateTime, endDateTime, now);
                         
+                            const session = {
+                                date: startDateTime.format("DD/MM/yyyy"),
+                                startHour: startDateTime.format("HH:mm"),
+                                endHour: endDateTime.format("HH:mm"),
+                                duration: durationHours,
+                                isVisio: isVisio,
+                                status: sessionStatus
+                            };
+                            if(isVisio && course.teamslink !== "null"){
+                                session.teamslink = course.teamslink;
+                            }
+
                             if (!subjectsSummary[subject]) {
                                 subjectsSummary[subject] = {
                                     firstDate: startDateTime,
@@ -81,7 +94,8 @@ router.get('/:class_name', async (req, res) => {
                                     sessions: {
                                         total: 1,
                                         realized: isRealized ? 1 : 0,
-                                        planned: isRealized ? 0 : 1
+                                        planned: isRealized ? 0 : 1,
+                                        list: [session]
                                     },
                                     hours: {
                                         total: durationHours,
@@ -114,6 +128,8 @@ router.get('/:class_name', async (req, res) => {
                                     subjectEntry.visioCount += 1;
                                 }
 
+                                subjectsSummary[subject].sessions.list.push(session);
+
                                 // Add unique teacher
                                 const teacherExists = subjectEntry.teachers.some(teacher => teacher.email === course.prof.email);
                                 if (!teacherExists && course.prof.name !== "" && course.prof.email !== "") {
@@ -121,6 +137,16 @@ router.get('/:class_name', async (req, res) => {
                                 }
                             }
                         });
+
+                        function getSessionStatus(startDateTime, endDateTime, now) {
+                            if (now.isBefore(startDateTime)) {
+                                return "planned";
+                            } else if (now.isBetween(startDateTime, endDateTime)) {
+                                return "in progress";
+                            } else {
+                                return "done";
+                            }
+                        }
 
                         const summaryArray = Object.keys(subjectsSummary).map(key => {
                             const summary = subjectsSummary[key];
