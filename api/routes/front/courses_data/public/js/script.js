@@ -87,6 +87,9 @@ function refreshData(className) {
                 // Add the module hours realized vs total
                 module.appendChild(createInfoParagraph('fas fa-clock', `Heures : ${item.hours.realized} / ${item.hours.total}`));
 
+                // Assume this is used inside your loop for each module after you've processed sessions_list and before appending the module
+                addSessionsList(module, item.sessions.list);
+
                 // Add the progress bar
                 const module_progress = document.createElement('div');
                 module_progress.className = 'w-full bg-gray-200 rounded-full overflow-hidden h-2 mb-4'; // Adjusted height for visibility
@@ -144,4 +147,94 @@ function refreshData(className) {
             console.error('There has been a problem with your fetch operation:', error);
             Swal.fire('Error', 'There was a problem with your fetch operation.', 'error'); // Show error message
         });
+}
+
+// This function adds a collapsible session list under each module
+function addSessionsList(module, sessions) {
+    const sessionListContainer = document.createElement('div');
+    sessionListContainer.className = 'mb-4';
+
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'flex items-center justify-between w-full mb-2'; // Adjust justify to 'justify-between'
+
+    // Create span for the text "Liste des cours"
+    const textSpan = document.createElement('span');
+    textSpan.textContent = 'Liste des cours :';
+    toggleButton.appendChild(textSpan);
+
+    // Create span for the icon
+    const iconI = document.createElement('i');
+    iconI.className = 'fas fa-chevron-down'; // Start with down arrow
+    toggleButton.appendChild(iconI);
+
+    const sessionList = document.createElement('div');
+    sessionList.className = 'hidden'; // Start hidden, will be toggled by the button
+
+    sessions.forEach(session => {
+        const sessionDiv = document.createElement('div');
+        sessionDiv.className = 'flex items-center justify-between';
+
+        const sessionInfo = document.createElement('span');
+        sessionInfo.innerHTML = `${session.date} - ${session.startHour} -> ${session.endHour}`;
+        sessionDiv.appendChild(sessionInfo);
+
+        // Part of the loop where you add each session to the sessionsContainer
+        if (session.isVisio) {
+            const visioIconWrapper = session.teamslink ? document.createElement('a') : document.createElement('span');
+            visioIconWrapper.title = "Cours en visio sans lien EDT Teams";
+            if (session.teamslink) {
+                visioIconWrapper.href = session.teamslink;
+                visioIconWrapper.target = "_blank"; // Ensures the link opens in a new tab
+                // add a mouse cursor to indicate the link is clickable
+                visioIconWrapper.style.cursor = "pointer";
+                visioIconWrapper.title = "Cours en visio avec lien EDT Teams";
+            }
+            const visioIcon = document.createElement('i');
+            visioIcon.className = 'fas fa-video text-blue-500 ml-2'; // Add ml-2 for some spacing
+
+            visioIconWrapper.appendChild(visioIcon);
+            sessionDiv.appendChild(visioIconWrapper);
+        }else{
+            // add a school icon
+            const schoolIcon = document.createElement('i');
+            schoolIcon.className = 'fas fa-school text-blue-500 ml-2'; // Add ml-2 for some spacing
+            schoolIcon.title = "Cours en présentiel";
+            sessionDiv.appendChild(schoolIcon);
+        }
+
+        const statusIcon = document.createElement('i');
+        switch(session.status) {
+            case 'done':
+                statusIcon.className = 'fas fa-check text-green-500';
+                break;
+            case 'in progress':
+                statusIcon.className = 'fas fa-hourglass-half text-orange-500';
+                break;
+            case 'planned':
+                statusIcon.className = 'fas fa-lock text-gray-500';
+                break;
+        }
+        sessionDiv.appendChild(statusIcon);
+
+        sessionList.appendChild(sessionDiv);
+    });
+
+    // Add event listener to toggle the icon and visibility
+    toggleButton.addEventListener('click', () => {
+        sessionList.classList.toggle('hidden'); // Toggle visibility of sessionList, not sessionListContainer
+        // Toggle the icon between down and up
+        let icon = toggleButton.querySelector('svg'); // Ensure you're selecting the icon within iconSpan
+        if (sessionList.classList.contains('hidden')) {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        }
+    });
+
+    sessionListContainer.appendChild(toggleButton);
+    sessionListContainer.appendChild(sessionList);
+
+    module.appendChild(sessionListContainer);
 }
