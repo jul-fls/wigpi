@@ -54,7 +54,7 @@ function refreshData(className) {
             dataContainer.innerHTML = ''; // Clear the container
             data.forEach(item => {
                 const module = document.createElement('div');
-                module.className = 'relative rounded-lg overflow-hidden shadow-lg bg-white m-4 p-6'; // Added 'relative' here
+                module.className = 'relative rounded-lg overflow-hidden shadow-lg bg-white p-2 min-w-64';
 
                 // Add the module name
                 const module_name = document.createElement('h1');
@@ -176,23 +176,41 @@ function addSessionsList(module, sessions) {
 
         const sessionInfo = document.createElement('span');
         sessionInfo.innerHTML = `${session.date} - ${session.startHour} -> ${session.endHour}`;
+        if(session.batiment && session.salle && session.batiment !== "VISIO" && session.salle !== "VISIO" && session.batiment !== "undefined" && session.salle !== "Aucune"){
+            sessionInfo.innerHTML += ` - ${session.batiment} ${session.salle}`;
+        }
         sessionDiv.appendChild(sessionInfo);
 
         // Part of the loop where you add each session to the sessionsContainer
         if (session.isVisio) {
-            const visioIconWrapper = session.teamslink ? document.createElement('a') : document.createElement('span');
+            const visioIconWrapper = document.createElement('span');
             visioIconWrapper.title = "Cours en visio sans lien EDT Teams";
-            if (session.teamslink) {
-                visioIconWrapper.href = session.teamslink;
-                visioIconWrapper.target = "_blank"; // Ensures the link opens in a new tab
-                // add a mouse cursor to indicate the link is clickable
-                visioIconWrapper.style.cursor = "pointer";
-                visioIconWrapper.title = "Cours en visio avec lien EDT Teams";
-            }
+
             const visioIcon = document.createElement('i');
             visioIcon.className = 'fas fa-video text-blue-500 ml-2'; // Add ml-2 for some spacing
+            
+            const VisioIconsDiv = document.createElement('div');
+            VisioIconsDiv.className = 'flex items-center';
 
-            visioIconWrapper.appendChild(visioIcon);
+            VisioIconsDiv.appendChild(visioIcon);
+            
+            if (session.teamslink) {
+                const visioTeamsLinkIcon = document.createElement('a');
+                visioTeamsLinkIcon.href = session.teamslink;
+                visioTeamsLinkIcon.className = 'px-2';
+                visioTeamsLinkIcon.target = "_blank"; // Ensures the link opens in a new tab
+                // add a mouse cursor to indicate the link is clickable
+                visioIconWrapper.title = "Cours en visio avec lien EDT Teams";
+                // create a microsoft teams icon
+                const teamsIcon = document.createElement('img');
+                // <img height="32" width="32" src="https://cdn.simpleicons.org/microsoftteams/6264a7ff" alt="Microsoft Teams">
+                teamsIcon.src = "https://cdn.simpleicons.org/microsoftteams/6264a7ff";
+                teamsIcon.alt = "Microsoft Teams";
+                teamsIcon.className = 'h-5 w5';
+                visioTeamsLinkIcon.appendChild(teamsIcon);
+                VisioIconsDiv.appendChild(visioTeamsLinkIcon);
+            }
+            visioIconWrapper.appendChild(VisioIconsDiv);
             sessionDiv.appendChild(visioIconWrapper);
         }else{
             // add a school icon

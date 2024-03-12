@@ -81,7 +81,9 @@ router.get('/:class_name', async (req, res) => {
                                 endHour: endDateTime.format("HH:mm"),
                                 duration: durationHours,
                                 isVisio: isVisio,
-                                status: sessionStatus
+                                status: sessionStatus,
+                                batiment: course.batiment,
+                                salle: course.salle,
                             };
                             if(isVisio && course.teamslink !== "null"){
                                 session.teamslink = course.teamslink;
