@@ -55,6 +55,7 @@ async function write(type,data,icsFileName){
         dtstamp = dtstamp.substring(0, dtstamp.length - 1);
         ics = "BEGIN:VEVENT" + "\n" +
         "UID:" + data.uid + "\n" +
+        "LAST-MODIFIED:" + dtstamp + "\n" +
         "DTSTAMP;" + tzid + dtstamp + "\n" +
         "DTSTART;" + tzid + data.dtstart + "\n" +
         "DTEND;" + tzid + data.dtend + "\n" +
