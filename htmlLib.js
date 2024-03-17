@@ -7,7 +7,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     const $date = date1;
     const $cours = $cours_of_the_week.map((cours) => {
         return {
-            'prof': cours.prof,
+            'prof': cours.prof.name,
             'matiere': cours.matiere,
             'annee': cours.annee,
             'salle': cours.salle,

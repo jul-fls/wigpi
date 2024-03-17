@@ -41,7 +41,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
             "icon_url": process.env.DISCORD_IMAGE
         },
         "image": {
-            "url": process.env.EXTERNAL_DOMAIN + "/api/get_png/" + classname + "/" + $random_str
+            "url": process.env.EXTERNAL_DOMAIN + "/api/courses/get_png/" + classname + "/" + $random_str
         }
     };
     $embeds.push($embed);
