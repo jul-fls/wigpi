@@ -48,8 +48,8 @@ async function getCoursForClass(username, classname, displayname) {
         // convert the date to YYYYMMDDT000000Z format
         let dateStr = date.toISOString().split('T')[0].replace(/-/g, '') + "T";
         ics.write("event", {
-            dtstart: dateStr + "000000",
-            dtend: dateStr + "235959",
+            dtstart: dateStr + "080000",
+            dtend: dateStr + "090000",
             matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
             prof: {name: "Erreur", email: "erreur@epsi.fr"},
             salle: "Erreur",
@@ -57,11 +57,11 @@ async function getCoursForClass(username, classname, displayname) {
             visio: false,
             teamslink: "",
             description: "",
-            uid: crypto.createHash('md5').update(dateStr + "000000" + "235959" + "Erreur" + "Erreur" + "Erreur" + "Erreur").digest("hex")
+            uid: crypto.createHash('md5').update(dateStr + "080000" + "090000" + "Erreur" + "Erreur" + "Erreur" + "Erreur").digest("hex")
         }, icsFileName);
         json.write("event", {
-            dtstart: dateStr + "000000",
-            dtend: dateStr + "235959",
+            dtstart: dateStr + "080000",
+            dtend: dateStr + "090000",
             matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
             prof: {name: "Erreur", email: "erreur@epsi.fr"},
             salle: "Erreur",
