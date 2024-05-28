@@ -27,50 +27,50 @@ async function getCoursForClass(username, classname, displayname) {
     nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
     json.write("start", displayname, jsonFileName);
-    // await getCoursForYear(actualYear, username)
-    //     .then(() => {
-    //         console.log("Done with year " + actualYear);
-    //     });
-    // await getCoursForYear(nextYear, username)
-    //     .then(() => {
-    //         console.log("Done with year " + nextYear);
-    //     })
-    //     .then(async() => {
-    //         ics.write("end", null, icsFileName);
-    //         json.write("end", null, jsonFileName);
-    //         console.log("Done writing ics file for class " + classname);
-    //         console.log("Done writing json file for class " + classname);
-    //     })
+    await getCoursForYear(actualYear, username)
+        .then(() => {
+            console.log("Done with year " + actualYear);
+        });
+    await getCoursForYear(nextYear, username)
+        .then(() => {
+            console.log("Done with year " + nextYear);
+        })
+        .then(async() => {
+            ics.write("end", null, icsFileName);
+            json.write("end", null, jsonFileName);
+            console.log("Done writing ics file for class " + classname);
+            console.log("Done writing json file for class " + classname);
+        })
     // create a loop to iterate every day from the 01/01/2024 to 31/12/2024
-    for (let i = 0; i < 365; i++) {
-        let date = new Date("2024-01-01");
-        date.setDate(date.getDate() + i);
-        // convert the date to YYYYMMDDT000000Z format
-        let dateStr = date.toISOString().split('T')[0].replace(/-/g, '') + "T";
-        ics.write("event", {
-            dtstart: dateStr + "080000",
-            dtend: dateStr + "090000",
-            matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
-            prof: {name: "Erreur", email: "erreur@epsi.fr"},
-            salle: "Erreur",
-            batiment: "Erreur",
-            visio: false,
-            teamslink: "",
-            description: "",
-            uid: crypto.createHash('md5').update(dateStr + "080000" + "090000" + "Erreur" + "Erreur" + "Erreur" + "Erreur").digest("hex")
-        }, icsFileName);
-        json.write("event", {
-            dtstart: dateStr + "080000",
-            dtend: dateStr + "090000",
-            matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
-            prof: {name: "Erreur", email: "erreur@epsi.fr"},
-            salle: "Erreur",
-            batiment: "Erreur",
-            visio: false,
-            teamslink: "",
-            description: ""
-        }, jsonFileName);
-    }
+    // for (let i = 0; i < 365; i++) {
+    //     let date = new Date("2024-01-01");
+    //     date.setDate(date.getDate() + i);
+    //     // convert the date to YYYYMMDDT000000Z format
+    //     let dateStr = date.toISOString().split('T')[0].replace(/-/g, '') + "T";
+    //     ics.write("event", {
+    //         dtstart: dateStr + "080000",
+    //         dtend: dateStr + "090000",
+    //         matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
+    //         prof: {name: "Erreur", email: "erreur@epsi.fr"},
+    //         salle: "Erreur",
+    //         batiment: "Erreur",
+    //         visio: false,
+    //         teamslink: "",
+    //         description: "",
+    //         uid: crypto.createHash('md5').update(dateStr + "080000" + "090000" + "Erreur" + "Erreur" + "Erreur" + "Erreur").digest("hex")
+    //     }, icsFileName);
+    //     json.write("event", {
+    //         dtstart: dateStr + "080000",
+    //         dtend: dateStr + "090000",
+    //         matiere: "Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible. Nous vous prions de nous excuser pour la gêne occasionnée.", 
+    //         prof: {name: "Erreur", email: "erreur@epsi.fr"},
+    //         salle: "Erreur",
+    //         batiment: "Erreur",
+    //         visio: false,
+    //         teamslink: "",
+    //         description: ""
+    //     }, jsonFileName);
+    // }
     ics.write("end", null, icsFileName);
     json.write("end", null, jsonFileName);
 

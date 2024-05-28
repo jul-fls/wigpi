@@ -12,6 +12,7 @@
     "puppeteer": "^18.0.5",
     "request": "^2.88.2",
     "simple-discord-webhooks": "^2.1.0",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "xml2js": "^0.6.2"
   }
 }

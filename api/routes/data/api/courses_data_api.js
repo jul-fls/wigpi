@@ -189,7 +189,7 @@ function isSimilarEnough(a, b, threshold = 0.8) {
         let s = new difflib.SequenceMatcher(null, a, b);
         return s.ratio() >= 0.95;
     }else{
-        let s = new difflib.SequenceMatcher(null, a, b);
+        let s = new difflib.SequenceMatcher(null, a.toLowerCase(), b.toLowerCase());
         return s.ratio() >= threshold;   
     }
 }

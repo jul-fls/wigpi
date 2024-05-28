@@ -21,7 +21,8 @@ function EpsiNameToEmail(name) {
         // Pattern: "part of name": "predetermined email"
         "graffin": "marie-sophie.graffin@bordeaux-epsi.fr",
         "toix": "florian.toix1@mail-formateur.net",
-        "ladrat": "geoffroy.ladrat1@mail-formateur.net"
+        "ladrat": "geoffroy.ladrat1@mail-formateur.net",
+        "pichon": "olivier.pichon1@mail-formteur.net",
     };
 
     // Normalize the name to remove accents
