@@ -1,32 +1,97 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WIGPI - Data - Cours</title>
     <script>
-        console.warn = () => {};
+      console.warn = () => {};
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script defer src="https://use.fontawesome.com/releases/v6.5.0/js/all.js"></script>
-    <link rel="stylesheet" href="/api/front/courses_data/public/css/styles.css">
-</head>
-<body class="bg-gray-100 p-5">
-    <h1 class="text-4xl font-bold text-center mb-10">WIGPI</h1>
-    <p class="text-xxl text-white bg-red-700 rounded-xl p-4 mb-8">
-        Nous rencontrons actuellement un problème avec notre fournisseur de données et nous prenons des mesures pour résoudre ces problèmes dès que possible.<br/>
-        Nous vous prions de nous excuser pour la gêne occasionnée.
-        <br/><br/>
-        Mise à jour du 14/05/2024 :
-        Nous sommes toujours en cours de résolution du problème. Néanmoins, nous sommes actuellement en train de tester une solution de contournement qui pourrait être mise en place dans les prochains jours.
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v6.5.0/js/all.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/api/front/courses_data/public/css/styles.css"
+    />
+  </head>
+  <body class="bg-light p-5">
+    <div
+      class="flex flex-col md:flex-row justify-start items-center md:items-start mb-5"
+    >
+      <div>
+        <img
+          src="/api/front/courses_data/public/assets/images/wigpi_logo.svg    "
+          alt="Logo"
+          class="w-16 h-16"
+        />
+      </div>
+      <div class="self-center">
+        <h1 class="text-5xl font-bold text-main">WIGPI</h1>
+      </div>
+      <div class="self-center md:self-end mb-3">
+        <p class="text-lg font-semibold text-center italic pl-3">
+          Le compagnon de vos études
+        </p>
+      </div>
+    </div>
+    <p class="text-xxl text-white bg-red-500 rounded-xl p-4 mb-5">
+      Nous rencontrons actuellement un problème avec notre fournisseur de
+      données et nous prenons des mesures pour résoudre ces problèmes dès que
+      possible.<br />
+      Nous vous prions de nous excuser pour la gêne occasionnée.
+      <br /><br />
+      Mise à jour du 14/05/2024 : Nous sommes toujours en cours de résolution du
+      problème. Néanmoins, nous sommes actuellement en train de tester une
+      solution de contournement qui pourrait être mise en place dans les
+      prochains jours.
     </p>
-    <select class="w-full bg-white rounded-lg shadow p-3 mb-5" id="classSelect" onchange="refreshData(this.value)">
-        <option disabled selected>Choisissez une classe</option>
-    </select>
-    <div id="dataContainer" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-        <!-- Data will be displayed here -->
+    <div class="flex flex-col md:flex-row gap-2 mb-5">
+      <div class="w-full md:basis-1/3">
+        <h2 class="text-2xl font-bold text-main mb-5">
+          Choisissez votre classe
+        </h2>
+        <select
+          class="w-full bg-white rounded-lg shadow p-3"
+          id="classSelect"
+          onchange="refreshData(this.value)"
+        >
+          <option disabled selected>Classe(s)</option>
+        </select>
+      </div>
+      <div class="w-full md:basis-1/3">
+        <h2 class="text-2xl font-bold text-main mb-5">
+          Recherchez votre intervenant(e)
+        </h2>
+        <input
+          class="w-full bg-white rounded-lg shadow p-3"
+          type="text"
+          placeholder="Rechercher..."
+          onKeyUp="filterCardsByName(this.value)"
+        />
+      </div>
+      <div class="w-full md:basis-1/3">
+        <h2 class="text-2xl font-bold text-main mb-5">
+          Cours terminés / en cours
+        </h2>
+        <select
+          class="w-full bg-white rounded-lg shadow p-3"
+          id="filterClassStatus"
+          onchange="filterCardsByStatus(this.value)"
+        >
+          <option disabled selected>Statut</option>
+        </select>
+      </div>
+    </div>
+    <div
+      id="dataContainer"
+      class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+    >
+      <!-- Data will be displayed here -->
     </div>
     <script src="/api/front/courses_data/public/js/script.js"></script>
-</body>
+  </body>
 </html>
