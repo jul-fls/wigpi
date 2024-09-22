@@ -37,12 +37,24 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
         "color": parseInt(process.env.DISCORD_EMBED_COLOR, 16),
         "timestamp": $refresh_date.toISOString(),
         "footer": {
-            "text": "EDT EPSI I1",
+            "text": "EDT EPSI I2",
             "icon_url": process.env.DISCORD_IMAGE
         },
         "image": {
             "url": process.env.EXTERNAL_DOMAIN + "/api/courses/get_png/" + classname + "/" + $random_str
-        }
+        },
+        "fields": [
+            {
+                "name": " ",
+                "value": `Lien calendrier Outlook / Google Agenda : ${process.env.EXTERNAL_DOMAIN.replace("https","webcals")}/api/courses/get_ics/${classname}`,
+                "inline": false
+            },
+            {
+                "name": " ",
+                "value": `[Page de données wigpi](${process.env.EXTERNAL_DOMAIN}/data)`,
+                "inline": false
+            }
+        ]
     };
     $embeds.push($embed);
     // $content = "<@&" + role_id + ">";
@@ -66,6 +78,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
         })
 }
 async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
+    console.log("Posting message for class " + classname);
     fs.readFile(process.env.ROOT_PATH + "messageIds/" + classname + ".txt", 'utf8', async function(err, message_id) {
         if (err) {
             fs.writeFile(process.env.ROOT_PATH + "messageIds/" + classname + ".txt", '', (err) => {

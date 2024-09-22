@@ -101,9 +101,9 @@
                 ]
             }
         },
-        "/get_ics/{class_name}": {
+        "/courses/get_ics/{class_name}": {
             "get": {
-                "summary": "GET /get_ics/{class_name}/{randomString}",
+                "summary": "GET /courses/get_ics/{class_name}",
                 "operationId": "GetIcsForClass",
                 "parameters": [
                     {

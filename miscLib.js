@@ -5,7 +5,7 @@ function normalizeString(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function EpsiNameToEmail(name) {
+async function EpsiNameToEmail(name) {
     // if name is less than 5 characters or is empty, return an empty string
     if (name.length < 5 || !name) {
         return "";
@@ -69,14 +69,14 @@ function EpsiNameToEmail(name) {
         profEmail = "";
     }
     // before returning, check if the email is valid against the O365 API
-    // const emailExists = await check_if_o365_user_exists(profEmail);
-    return profEmail;
-    // if (!emailExists) {
-    //     // If the email is invalid, return an empty string
-    //     return "";
-    // }else{
-    //     return profEmail;
-    // }
+    const emailExists = await check_if_o365_user_exists(profEmail);
+    // return profEmail;
+    if (!emailExists) {
+        // If the email is invalid, return an empty string
+        return "";
+    }else{
+        return profEmail;
+    }
 }
 
 async function check_if_o365_user_exists(email){
@@ -93,7 +93,39 @@ async function check_if_o365_user_exists(email){
     return !data.IfExistsResult;
 }
 
+async function getCookiesForUser(user) {
+    const url = process.env.AUTH_SERVICE_URL;
+    const requestBody = {
+        username: user.username,
+        password: user.password
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const responseBody = await response.json();
+
+        if (responseBody.status === "success") {
+            console.log("Cookies récupérés pour l'utilisateur " + user.username);
+            return responseBody.data.cookies; // Return cookies directly
+        } else {
+            console.error("Erreur lors de la récupération des cookies pour l'utilisateur " + user.username, responseBody);
+            return null;
+        }
+    } catch (error) {
+        console.error('Une erreur s\'est produite lors de l\'accès à l\'url ' + url + "\nErreur: " + error);
+        return null;
+    }
+}
+
 module.exports = {
     EpsiNameToEmail,
-    check_if_o365_user_exists
+    check_if_o365_user_exists,
+    getCookiesForUser
 };

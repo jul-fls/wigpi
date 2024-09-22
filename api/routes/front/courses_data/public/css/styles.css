@@ -1,13 +1,57 @@
 @keyframes move {
-    from { background-position: 1rem 0; }
-    to { background-position: 0 0; }
+  from {
+    background-position: 1rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }
 
 .progress-striped {
-    background-image: linear-gradient(135deg, rgba(255,255,255,.3) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.3) 50%, rgba(255,255,255,.3) 75%, transparent 75%, transparent);
-    background-size: 1rem 1rem;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.5) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
 }
 
 .progress-animated {
-    animation: move 1s linear infinite;
+  animation: move 1s linear infinite;
+}
+
+.bg-light {
+  background-color: #d9dde1 !important;
+}
+
+.text-main {
+  color: #4b4b99 !important;
+}
+
+.text-secondary {
+  color: #36b6d4 !important;
+}
+
+.bg-main {
+  background-color: #4b4b99 !important;
+}
+
+.bg-secondary {
+  background-color: #36b6d4 !important;
+}
+
+.bg-card {
+  background-color: #dbdfe3 !important;
+}
+
+.shadow-neumorphism {
+  box-shadow: 0 -10px 20px -5px rgba(255, 255, 255, 0.75),
+    -10px 0 20px -5px rgba(255, 255, 255, 0.75),
+    0 10px 20px -5px rgba(115, 115, 115, 0.75),
+    10px 0 20px -5px rgba(115, 115, 115, 0.75);
 }

@@ -12,6 +12,7 @@ function filterAndRenameCourses(courses) {
     let data = {}; // Use this object to track unique course names and their data
     let processedCourses = [];
 
+    // Convert course dates and store in an easier-to-process array
     courses.forEach(course => {
         let courseName = decodeURIComponent(JSON.parse('"' + course.matiere + '"')).trim();
         let matchedKey = Object.keys(data).find(key => isSimilarEnough(key, courseName));
@@ -29,17 +30,20 @@ function filterAndRenameCourses(courses) {
         let newCourse = { ...course, matiere: courseName, prof: { name: profName, email: course.prof.email } };
         processedCourses.push(newCourse);
     });
-    
+
     // Sort the processedCourses by start time in chronological order
     processedCourses.sort((a, b) => moment(a.dtstart, "YYYYMMDDTHHmmss").diff(moment(b.dtstart, "YYYYMMDDTHHmmss")));
-    // Find the index of the first workshop module based on chronological order
-    const workshopIndex = processedCourses.findIndex(course => course.matiere.toLowerCase().includes("workshop"));
 
-    // If the workshop is found, filter to keep only the workshop and the modules after it
-    if (workshopIndex !== -1) {
-        processedCourses = processedCourses.slice(workshopIndex);
+    // Find the first course in September
+    const septemberStartIndex = processedCourses.findIndex(course => {
+        const courseDate = moment(course.dtstart, "YYYYMMDDTHHmmss");
+        return courseDate.month() === 8; // September is month 8 (0-indexed months in moment.js)
+    });
+
+    // If the first September course is found, filter from that point onward
+    if (septemberStartIndex !== -1) {
+        processedCourses = processedCourses.slice(septemberStartIndex);
     }
-
 
     const dev_processedCourses = processedCourses.slice(0, 10);
     return processedCourses;

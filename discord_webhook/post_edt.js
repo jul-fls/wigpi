@@ -1,22 +1,28 @@
 require('dotenv').config();
 var fs = require('fs');
 var path = require('path');
-var $classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH+"api/classes.json", 'utf8'));
 var htmlLib = require('../htmlLib.js');
 const cal = require('../calendarLib.js');
 var discordLib = require('./discordLib.js');
-$classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH+"api/classes.json", 'utf8'));
+var miscLib = require('../miscLib.js');
+const $classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH+"api/classes.json", 'utf8'));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function main(class_name){
     $date = new Date();
     $date.setDate($date.getDate() - $date.getDay() + 1);
     $date_str = ('0' + $date.getDate()).slice(-2) + "/" + ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + $date.getFullYear();
     $date_str_2 = ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + ('0' + $date.getDate()).slice(-2) + "/" + $date.getFullYear();
-    console.log($date_str_2)
-    var serverids = process.env.WIGOR_SERVER_IDS.split("");
+    console.log($date_str_2);
     base_url = process.env.WIGOR_BASE_URL;
-    serverid = serverids[Math.floor(Math.random() * serverids.length)];
-    await cal.getCalendarForWeek(base_url, serverid, class_name.username, $date_str_2)
+    const cookies = await miscLib.getCookiesForUser(class_name.user);
+    
+    if (cookies !== null) {
+        class_name.user.cookies = cookies;
+    } else {
+        console.error("Erreur lors de la récupération des cookies pour l'utilisateur " + user.username);
+        return;
+    }
+    await cal.getCalendarForWeek(base_url, class_name.user, $date_str_2)
         .then(async(cours_of_the_week) => {
             //if there is courses
             if (cours_of_the_week && cours_of_the_week.length > 0) {
