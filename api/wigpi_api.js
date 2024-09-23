@@ -19,6 +19,7 @@ const classesRouteGetJson = require('./routes/classes/get_json');
 const coursesRouteGetIcs = require('./routes/courses/get_ics');
 const coursesRouteGetJson = require('./routes/courses/get_json');
 const coursesRouteGetPng = require('./routes/courses/get_png');
+const coursesRouteGetHtml = require('./routes/courses/get_html');
 const dataRouteCoursesDataAPI = require('./routes/data/api/courses_data_api');
 const teachersRouteCheckIfEmailExists = require('./routes/teachers/check_if_email_exists');
 const testCasCallbackRoute = require('./routes/test_cas/callback'); // TEST CAS CALLBACK
@@ -27,6 +28,7 @@ app.use('/api/classes/get_json', classesRouteGetJson);
 app.use('/api/courses/get_ics', coursesRouteGetIcs);
 app.use('/api/courses/get_json', coursesRouteGetJson);
 app.use('/api/courses/get_png', coursesRouteGetPng);
+app.use('/api/courses/get_html', coursesRouteGetHtml);
 app.use('/api/data/courses_data', dataRouteCoursesDataAPI);
 app.use('/api/teachers/check_if_email_exists', teachersRouteCheckIfEmailExists);
 app.use('/api/test_cas/callback', testCasCallbackRoute); // TEST CAS CALLBACK

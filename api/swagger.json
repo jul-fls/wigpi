@@ -131,6 +131,36 @@
                 ]
             }
         },
+        "/courses/get_html/{class_name}": {
+            "get": {
+                "summary": "GET /courses/get_html/{class_name}",
+                "operationId": "GetHtmlForClass",
+                "parameters": [
+                    {
+                        "name": "class_name",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML File",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Generic"
+                ]
+            }
+        },
         "/data/courses_data/{class_name}": {
             "get": {
                 "summary": "GET /courses_data/{class_name}",

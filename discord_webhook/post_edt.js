@@ -30,7 +30,6 @@ async function main(class_name){
                     .then(async (result) => {
                         console.log("HTML generated for " + class_name.name);
                         //save html file in the folder
-                        fs.writeFileSync(process.env.ROOT_PATH+"htmlFiles/"+class_name.name+".html", result);
                         await discordLib.post_edt(class_name.webhookid, class_name.webhooktoken, class_name.roleid, $date_str, class_name.name);
                     });
             }else{
