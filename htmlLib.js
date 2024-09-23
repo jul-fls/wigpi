@@ -131,7 +131,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `http://192.168.1.131:20002/screenshot?width=2600&height=1300&url=https://wigpi.flusin.fr/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=2600&height=1300&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
     try {
         const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
         fs.writeFileSync(process.env.ROOT_PATH + `pngFiles/${classname}.png`, response.data);
