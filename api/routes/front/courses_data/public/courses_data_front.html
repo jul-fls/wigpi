@@ -38,7 +38,7 @@
         </p>
       </div>
     </div>
-    <p class="text-xxl text-white bg-red-500 rounded-xl p-4 mb-5">
+    <!-- <p class="text-xxl text-white bg-red-500 rounded-xl p-4 mb-5">
       Nous rencontrons actuellement un problème avec notre fournisseur de
       données et nous prenons des mesures pour résoudre ces problèmes dès que
       possible.<br />
@@ -51,7 +51,7 @@
       <br /><br />
       Mise à jour du 21/09/2024 : Nous avons mis en place une solution de contournement qui devrait vous permettre de consulter les données des cours. Nous vous prions de nous excuser pour la gêne occasionnée.
       Si toutefois vous rencontrez des problèmes, n'hésitez pas à nous contacter.
-    </p>
+    </p> -->
     <div class="flex flex-col md:flex-row gap-2 mb-5">
       <div class="w-full md:basis-1/3">
         <h2 class="text-2xl font-bold text-main mb-5">
@@ -66,55 +66,33 @@
         </select>
       </div>
       <div class="w-full md:basis-1/3">
-        <h2 class="text-2xl font-bold text-main mb-5">
-          Recherchez votre intervenant(e), matière, date...
-        </h2>
-        <input
-          class="w-full bg-white rounded-lg shadow p-6"
-          type="text"
-          placeholder="Rechercher..."
-          onKeyUp="filterCardsByName(this.value)"
-        />
-      </div>
-      <div class="w-full flex flex-wrap md:basis-1/3">
-        <!-- Statut filter -->
-        <div class="w-full md:w-1/2">
-          <h2 class="text-2xl font-bold text-main mb-5">Filtre par statut</h2>
-          <div id="filterClassStatus">
-            <label>
-              <input type="checkbox" value="Terminé" onchange="filterCardsByStatus()"> Terminé
-            </label>
-            <br>
-            <label>
-              <input type="checkbox" value="En cours" onchange="filterCardsByStatus()"> En cours
-            </label>
-            <br>
-            <label>
-              <input type="checkbox" value="Non commencé" onchange="filterCardsByStatus()"> Non commencé
-            </label>
-          </div>
-        </div>
-      
-        <!-- Batiment filter -->
-        <div class="w-full md:w-1/2">
-          <h2 class="text-2xl font-bold text-main mb-5">Filtre par batiment</h2>
-          <div id="filterClassBatiment">
-            <label>
-              <input type="checkbox" value="Bruges" onchange="filterCardsByBatiment()"> Bruges
-            </label>
-            <br>
-            <label>
-              <input type="checkbox" value="Faure" onchange="filterCardsByBatiment()"> Bordeaux
-            </label>
-            <br>
-            <label>
-              <input type="checkbox" value="VISIO" onchange="filterCardsByBatiment()"> VISIO
-            </label>
-          </div>
-        </div>
-      </div>
-      
+        <h2 class="text-2xl font-bold text-main mb-5">Recherchez votre intervenant(e), matière, date...</h2>
+        <input class="w-full bg-white rounded-lg shadow p-6" type="text" placeholder="Rechercher..." onkeyup="filterCardsByName(this.value)">
     </div>
+    <div class="w-full md:basis-1/3 flex flex-row">
+        <div class="w-full md:w-1/2">
+            <h2 class="text-2xl font-bold text-main mb-5">Statut</h2>
+            <div id="filterClassStatus">
+                <label><input type="checkbox" value="Terminé" onchange="filterCardsByStatus()"> Terminé</label><br>
+                <label><input type="checkbox" value="En cours" onchange="filterCardsByStatus()"> En cours</label><br>
+                <label><input type="checkbox" value="Non commencé" onchange="filterCardsByStatus()"> Non commencé</label>
+            </div>
+        </div>
+        <div class="w-full md:w-1/2">
+            <h2 class="text-2xl font-bold text-main mb-5">Bâtiment</h2>
+            <div id="filterClassBatiment">
+                <label><input type="checkbox" value="Bruges" onchange="filterCardsByBatiment()"> Bruges</label><br>
+                <label><input type="checkbox" value="Faure" onchange="filterCardsByBatiment()"> Faure</label><br>
+                <label><input type="checkbox" value="VISIO" onchange="filterCardsByBatiment()"> VISIO</label>
+            </div>
+        </div>
+        <div class="w-full md:w-1/2 md:ml-auto">
+            <h2 class="text-2xl font-bold text-main mb-5">Fraicheur des données</h2>
+          <div><i class="fa-solid fa-clock-rotate-left mr-2"></i><span id="dataFreshnessIndicator">N/A</span></div>
+        </div>
+      </div>
+    </div>
+
     <div
       id="dataContainer"
       class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"

@@ -58,15 +58,16 @@ router.get('/:class_name', async (req, res) => {
     for (var i = 0; i < $classes.length; i++) {
         if ($status != 0) {
             break;
-        }else{
+        } else {
             if ($classes[i].name === class_name) {
                 $status = 1;
                 let classFilePath = root_path + "/jsonFiles/" + class_name + ".json";
                 if (fs.existsSync(classFilePath)) {
                     let classData = JSON.parse(fs.readFileSync(classFilePath, 'utf8'));
-        
+
                     if (classData.courses.length > 0) {
                         // Apply filtering and renaming logic to courses
+                        let dataTimestamp = classData.info.timestamp; // Extracting the dataTimestamp
                         let processedCourses = filterAndRenameCourses(classData.courses);
                         const subjectsSummary = {};
                         const now = moment(); // Current date and time
@@ -78,7 +79,7 @@ router.get('/:class_name', async (req, res) => {
                             const isRealized = endDateTime.isBefore(now);
                             const isVisio = course.visio;
                             const sessionStatus = getSessionStatus(startDateTime, endDateTime, now);
-                        
+
                             const session = {
                                 date: startDateTime.format("DD/MM/yyyy"),
                                 startHour: startDateTime.format("HH:mm"),
@@ -89,7 +90,7 @@ router.get('/:class_name', async (req, res) => {
                                 batiment: course.batiment,
                                 salle: course.salle,
                             };
-                            if(isVisio && course.teamslink !== "null"){
+                            if (isVisio && course.teamslink !== "null") {
                                 session.teamslink = course.teamslink;
                             }
 
@@ -139,7 +140,7 @@ router.get('/:class_name', async (req, res) => {
                                 // Add unique teacher
                                 const teacherExists = subjectEntry.teachers.some(teacher => teacher.email === course.prof.email);
                                 if (!teacherExists && course.prof.name !== "" && course.prof.email !== "") {
-                                    subjectEntry.teachers.push({name: course.prof.name, email: course.prof.email});
+                                    subjectEntry.teachers.push({name: course.prof.name, email: course.prof.email });
                                 }
                             }
                         });
@@ -172,11 +173,13 @@ router.get('/:class_name', async (req, res) => {
                                 percentageOfVisio: percentageOfVisio
                             };
                         });
-                        res.json(summaryArray);
+
+                        // Add the dataTimestamp to the response
+                        res.json({ dataTimestamp: dataTimestamp, subjects: summaryArray });
                     }
                 }
             }
-        }        
+        }
     }
 });
 

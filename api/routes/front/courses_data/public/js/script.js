@@ -57,8 +57,19 @@ function refreshData(className) {
     .then((data) => {
       Swal.close(); // Close the Swal loading indicator
       const dataContainer = document.getElementById("dataContainer");
+      const dataFreshnessIndicator = document.getElementById("dataFreshnessIndicator");
       dataContainer.innerHTML = ""; // Clear the container
-      data.forEach((item) => {
+      // compare data.dataTimestamp to the current date and time and display a humanly readable message like 47m ago without using moment
+      const dateTimestamp = new Date(parseInt(data.dataTimestamp));
+      const now = new Date();
+      const diffMs = now - dateTimestamp;
+      const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+      const diffHours = Math.round(diffMins / 60); // hours
+      const dataFreshnessText = diffHours > 0 ? `${diffHours}h` : `${diffMins}m`;
+
+      dataFreshnessIndicator.innerHTML = `Dernière mise à jour : Il y a ${dataFreshnessText}`;
+      dataFreshnessIndicator.title= `Dernière mise à jour : ${dateTimestamp.toLocaleString()}`;
+      data.subjects.forEach((item) => {
         const module = document.createElement("div");
         module.className =
           "relative rounded-lg overflow-hidden  p-5 min-w-64 shadow-neumorphism ";
