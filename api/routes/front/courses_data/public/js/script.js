@@ -36,6 +36,55 @@ fetch("https://wigpi.flusin.fr/api/classes/get_json")
     ); // Show error message
   });
 
+
+  function createStatsTable(stats) {
+    const table = document.createElement("table");
+    table.className = "w-full bg-white rounded-lg shadow-lg p-6"; // Tailwind classes for neumorphism-like shadow
+
+    // Create the header row
+    const headerRow = document.createElement("tr");
+    const headers = ["", "Total heures edt", "Total heures réalisées", "Total heures planifiées", "Répartition heures edt", "Pourcentage heures réalisées"];
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.className = "text-left p-4 border-b font-bold text-gray-700"; // Tailwind styles
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Create the data rows
+    const statRows = [
+        { name: "Bruges", data: stats.Bruges },
+        { name: "Faure", data: stats.Faure },
+        { name: "VISIO", data: stats.VISIO },
+        { name: "Total", data: stats.Total }
+    ];
+
+    statRows.forEach(statRow => {
+        const row = document.createElement("tr");
+        const cellNames = [
+            statRow.name,
+            statRow.data.TotalHeuresEdt,
+            statRow.data.TotalHeuresRealisees,
+            statRow.data.TotalHeuresPlanifiees,
+            Math.round(statRow.data.RepartitionHeuresEdt)+"%", // Round percentages
+            Math.round(statRow.data.PourcentageHeuresRealisees)+"%"
+        ];
+
+        cellNames.forEach(cellValue => {
+            const td = document.createElement("td");
+            td.className = "p-4 text-gray-800 border-b"; // Tailwind classes
+            td.textContent = cellValue;
+            row.appendChild(td);
+        });
+
+        table.appendChild(row);
+    });
+
+    return table;
+}
+
+
 function refreshData(className) {
   Swal.fire({
     title: "Loading...",
@@ -57,18 +106,45 @@ function refreshData(className) {
     .then((data) => {
       Swal.close(); // Close the Swal loading indicator
       const dataContainer = document.getElementById("dataContainer");
+
+      dataContainer.innerHTML = ""; // Clear the container
+      
+      
+      // Data freshness indicator
       const dataFreshnessIndicator = document.getElementById("dataFreshnessIndicator");
       dataContainer.innerHTML = ""; // Clear the container
-      // compare data.dataTimestamp to the current date and time and display a humanly readable message like 47m ago without using moment
+      
       const dateTimestamp = new Date(parseInt(data.dataTimestamp));
       const now = new Date();
+
+      // Calculate the time difference
       const diffMs = now - dateTimestamp;
-      const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
-      const diffHours = Math.round(diffMins / 60); // hours
-      const dataFreshnessText = diffHours > 0 ? `${diffHours}h` : `${diffMins}m`;
+      const diffMins = Math.floor((diffMs % 3600000) / 60000); // remaining minutes after full hours
+      const diffHours = Math.floor(diffMs / 3600000); // full hours
+      
+      let dataFreshnessText = '';
+      
+      if (diffHours > 0) {
+        // Display both hours and minutes if applicable
+        dataFreshnessText = diffMins > 0 ? `${diffHours}h ${diffMins}m` : `${diffHours}h`;
+      } else {
+        dataFreshnessText = `${diffMins}m`; // Only display minutes if less than an hour
+      }
 
       dataFreshnessIndicator.innerHTML = `Dernière mise à jour : Il y a ${dataFreshnessText}`;
-      dataFreshnessIndicator.title= `Dernière mise à jour : ${dateTimestamp.toLocaleString()}`;
+      dataFreshnessIndicator.title = `Dernière mise à jour : ${dateTimestamp.toLocaleString()}`;
+
+      // Create the stats table
+      const statsContainer = document.getElementById("statsContainer");
+
+      // Clear any existing data in the stats container
+      statsContainer.innerHTML = '';
+
+      // Create and append the stats table
+      const statsTable = createStatsTable(data.stats);
+      statsContainer.appendChild(statsTable);
+
+      // Add the data to the container
       data.subjects.forEach((item) => {
         const module = document.createElement("div");
         module.className =
@@ -289,10 +365,46 @@ function filterCardsByBatiment() {
 
 
 // This function adds a collapsible session list under each module
+// This function adds a collapsible session list under each module and displays the next planned session
 function addSessionsList(module, sessions) {
   const sessionListContainer = document.createElement("div");
   sessionListContainer.className = "mb-4";
 
+  // First, find the next planned session
+  const nextPlannedSession = sessions.find(session => session.status === "planned");
+
+  if (nextPlannedSession) {
+    // Create a container to display the next planned session
+    const nextSessionContainer = document.createElement("div");
+    nextSessionContainer.className = "mb-4 p-3 bg-blue-100 rounded-lg";
+
+    const nextSessionTitle = document.createElement("h2");
+    nextSessionTitle.className = "font-bold text-lg text-blue-700 mb-2";
+    nextSessionTitle.textContent = "Prochaine session planifiée :";
+
+    const nextSessionInfo = document.createElement("div");
+    nextSessionInfo.className = "flex items-center justify-between";
+    nextSessionInfo.innerHTML = `${nextPlannedSession.date} - ${nextPlannedSession.startHour} 🡲 ${nextPlannedSession.endHour}`;
+
+    if (
+      nextPlannedSession.batiment &&
+      nextPlannedSession.salle &&
+      nextPlannedSession.batiment !== "VISIO" &&
+      nextPlannedSession.salle !== "VISIO" &&
+      nextPlannedSession.batiment !== "undefined" &&
+      nextPlannedSession.salle !== "Aucune"
+    ) {
+      nextSessionInfo.innerHTML += `</br> (${nextPlannedSession.batiment} ${nextPlannedSession.salle})`;
+    }else if(nextPlannedSession.batiment === "VISIO" || nextPlannedSession.salle === "VISIO"){
+      nextSessionInfo.innerHTML += `</br> (Cours en visio)`;
+    }
+
+    nextSessionContainer.appendChild(nextSessionTitle);
+    nextSessionContainer.appendChild(nextSessionInfo);
+    module.appendChild(nextSessionContainer);
+  }
+
+  // Now create the toggle button and session list for "Liste des cours"
   const toggleButton = document.createElement("button");
   toggleButton.className = "flex items-center justify-between w-full mb-2"; // Adjust justify to 'justify-between'
 
@@ -312,7 +424,6 @@ function addSessionsList(module, sessions) {
   sessions.forEach((session) => {
     const sessionDiv = document.createElement("div");
     sessionDiv.className = "flex items-center justify-between";
-    // set custom attribute "batiment" pour chaque session afin de pouvoir faire un filtre par batiment dans la page avec un queryselectorall
     sessionDiv.setAttribute("batiment", session.batiment);
 
     const sessionInfo = document.createElement("span");
@@ -330,7 +441,6 @@ function addSessionsList(module, sessions) {
     }
     sessionDiv.appendChild(sessionInfo);
 
-    // Part of the loop where you add each session to the sessionsContainer
     if (session.isVisio) {
       const visioIconWrapper = document.createElement("span");
       visioIconWrapper.title = "Cours en visio sans lien EDT Teams";
@@ -348,23 +458,19 @@ function addSessionsList(module, sessions) {
         visioTeamsLinkIcon.href = session.teamslink;
         visioTeamsLinkIcon.className = "px-2";
         visioTeamsLinkIcon.target = "_blank"; // Ensures the link opens in a new tab
-        // add a mouse cursor to indicate the link is clickable
-        visioIconWrapper.title = "Cours en visio avec lien EDT Teams";
-        // create a microsoft teams icon
+
         const teamsIcon = document.createElement("img");
-        // <img height="32" width="32" src="https://cdn.simpleicons.org/microsoftteams/6264a7ff" alt="Microsoft Teams">
         teamsIcon.src = "https://cdn.simpleicons.org/microsoftteams/6264a7ff";
         teamsIcon.alt = "Microsoft Teams";
-        teamsIcon.className = "h-5 w5";
+        teamsIcon.className = "h-5 w-5";
         visioTeamsLinkIcon.appendChild(teamsIcon);
         VisioIconsDiv.appendChild(visioTeamsLinkIcon);
       }
       visioIconWrapper.appendChild(VisioIconsDiv);
       sessionDiv.appendChild(visioIconWrapper);
     } else {
-      // add a school icon
       const schoolIcon = document.createElement("i");
-      schoolIcon.className = "fas fa-school text-secondary ml-2"; // Add ml-2 for some spacing
+      schoolIcon.className = "fas fa-school text-secondary ml-2";
       schoolIcon.title = "Cours en présentiel";
       sessionDiv.appendChild(schoolIcon);
     }
@@ -389,8 +495,7 @@ function addSessionsList(module, sessions) {
   // Add event listener to toggle the icon and visibility
   toggleButton.addEventListener("click", () => {
     sessionList.classList.toggle("hidden"); // Toggle visibility of sessionList, not sessionListContainer
-    // Toggle the icon between down and up
-    let icon = toggleButton.querySelector("svg"); // Ensure you're selecting the icon within iconSpan
+    let icon = toggleButton.querySelector("svg");
     if (sessionList.classList.contains("hidden")) {
       icon.classList.remove("fa-chevron-up");
       icon.classList.add("fa-chevron-down");

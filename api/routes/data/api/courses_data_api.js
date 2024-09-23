@@ -8,6 +8,17 @@ const difflib = require('difflib');
 const moment = require('moment-timezone');
 let root_path = process.env.root_path || process.cwd();
 
+function getSessionStatus(startDateTime, endDateTime, now) {
+    if (now.isBefore(startDateTime)) {
+        return "planned";
+    } else if (now.isBetween(startDateTime, endDateTime)) {
+        return "in progress";
+    } else {
+        return "done";
+    }
+}
+
+
 function filterAndRenameCourses(courses) {
     let data = {}; // Use this object to track unique course names and their data
     let processedCourses = [];
@@ -67,10 +78,51 @@ router.get('/:class_name', async (req, res) => {
 
                     if (classData.courses.length > 0) {
                         // Apply filtering and renaming logic to courses
-                        let dataTimestamp = classData.info.timestamp; // Extracting the dataTimestamp
+                        let dataTimestamp = classData.info.timestamp;
                         let processedCourses = filterAndRenameCourses(classData.courses);
+                        
+                        // Initialize stats for each batiment
+                        const stats = {
+                            Bruges: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 },
+                            Faure: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 },
+                            VISIO: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 },
+                            Total: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 }
+                        };
+                        const now = moment();
+
+                        // Process courses for stats calculation
+                        processedCourses.forEach(course => {
+                            const batiment = course.batiment || 'Unknown';
+                            const startDateTime = parseDateTime(course.dtstart);
+                            const endDateTime = parseDateTime(course.dtend);
+                            const durationHours = endDateTime.diff(startDateTime, 'hours', true);
+                            const isRealized = endDateTime.isBefore(now);
+
+                            if (stats[batiment]) {
+                                stats[batiment].totalEdt += durationHours;
+                                stats[batiment].totalPlanned += durationHours;
+                                if (isRealized) {
+                                    stats[batiment].totalRealized += durationHours;
+                                }
+                            }
+                            stats.Total.totalEdt += durationHours;
+                            stats.Total.totalPlanned += durationHours;
+                            if (isRealized) {
+                                stats.Total.totalRealized += durationHours;
+                            }
+                        });
+
+                        // Calculate Répartition heures edt and % heures réalisées for each batiment
+                        Object.keys(stats).forEach(batiment => {
+                            const totalHoursEdt = stats[batiment].totalEdt;
+                            const totalRealized = stats[batiment].totalRealized;
+
+                            stats[batiment].repartitionHeuresEdt = ((totalHoursEdt / stats.Total.totalEdt) * 100).toFixed(8);
+                            stats[batiment].pourcentageHeuresRealisees = totalHoursEdt ? ((totalRealized / totalHoursEdt) * 100).toFixed(2) : 0;
+                        });
+
+                        // Process courses into subjectsSummary (keeping subjects intact)
                         const subjectsSummary = {};
-                        const now = moment(); // Current date and time
                         processedCourses.forEach(course => {
                             const subject = course.matiere;
                             const startDateTime = parseDateTime(course.dtstart);
@@ -135,7 +187,7 @@ router.get('/:class_name', async (req, res) => {
                                     subjectEntry.visioCount += 1;
                                 }
 
-                                subjectsSummary[subject].sessions.list.push(session);
+                                subjectEntry.sessions.list.push(session);
 
                                 // Add unique teacher
                                 const teacherExists = subjectEntry.teachers.some(teacher => teacher.email === course.prof.email);
@@ -144,16 +196,6 @@ router.get('/:class_name', async (req, res) => {
                                 }
                             }
                         });
-
-                        function getSessionStatus(startDateTime, endDateTime, now) {
-                            if (now.isBefore(startDateTime)) {
-                                return "planned";
-                            } else if (now.isBetween(startDateTime, endDateTime)) {
-                                return "in progress";
-                            } else {
-                                return "done";
-                            }
-                        }
 
                         const summaryArray = Object.keys(subjectsSummary).map(key => {
                             const summary = subjectsSummary[key];
@@ -174,8 +216,41 @@ router.get('/:class_name', async (req, res) => {
                             };
                         });
 
-                        // Add the dataTimestamp to the response
-                        res.json({ dataTimestamp: dataTimestamp, subjects: summaryArray });
+                        // Add the dataTimestamp and stats to the response
+                        res.json({
+                            dataTimestamp: dataTimestamp,
+                            subjects: summaryArray, // Keep the subjects as you originally intended
+                            stats: {
+                                Bruges: {
+                                    TotalHeuresEdt: stats.Bruges.totalEdt,
+                                    TotalHeuresRealisees: stats.Bruges.totalRealized,
+                                    TotalHeuresPlanifiees: stats.Bruges.totalPlanned,
+                                    RepartitionHeuresEdt: stats.Bruges.repartitionHeuresEdt,
+                                    PourcentageHeuresRealisees: stats.Bruges.pourcentageHeuresRealisees
+                                },
+                                Faure: {
+                                    TotalHeuresEdt: stats.Faure.totalEdt,
+                                    TotalHeuresRealisees: stats.Faure.totalRealized,
+                                    TotalHeuresPlanifiees: stats.Faure.totalPlanned,
+                                    RepartitionHeuresEdt: stats.Faure.repartitionHeuresEdt,
+                                    PourcentageHeuresRealisees: stats.Faure.pourcentageHeuresRealisees
+                                },
+                                VISIO: {
+                                    TotalHeuresEdt: stats.VISIO.totalEdt,
+                                    TotalHeuresRealisees: stats.VISIO.totalRealized,
+                                    TotalHeuresPlanifiees: stats.VISIO.totalPlanned,
+                                    RepartitionHeuresEdt: stats.VISIO.repartitionHeuresEdt,
+                                    PourcentageHeuresRealisees: stats.VISIO.pourcentageHeuresRealisees
+                                },
+                                Total: {
+                                    TotalHeuresEdt: stats.Total.totalEdt,
+                                    TotalHeuresRealisees: stats.Total.totalRealized,
+                                    TotalHeuresPlanifiees: stats.Total.totalPlanned,
+                                    RepartitionHeuresEdt: stats.Total.repartitionHeuresEdt,
+                                    PourcentageHeuresRealisees: stats.Total.pourcentageHeuresRealisees
+                                }
+                            }
+                        });
                     }
                 }
             }
