@@ -5,7 +5,6 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const difflib = require('difflib');
-const moment = require('moment-timezone');
 let root_path = process.env.root_path || process.cwd();
 
 router.get('/', async (req, res) => {

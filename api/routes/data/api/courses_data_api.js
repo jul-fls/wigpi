@@ -5,19 +5,17 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const difflib = require('difflib');
-const moment = require('moment-timezone');
 let root_path = process.env.root_path || process.cwd();
 
 function getSessionStatus(startDateTime, endDateTime, now) {
-    if (now.isBefore(startDateTime)) {
+    if (now < startDateTime) {
         return "planned";
-    } else if (now.isBetween(startDateTime, endDateTime)) {
+    } else if (now >= startDateTime && now <= endDateTime) {
         return "in progress";
     } else {
         return "done";
     }
 }
-
 
 function filterAndRenameCourses(courses) {
     let data = {}; // Use this object to track unique course names and their data
@@ -43,12 +41,16 @@ function filterAndRenameCourses(courses) {
     });
 
     // Sort the processedCourses by start time in chronological order
-    processedCourses.sort((a, b) => moment(a.dtstart, "YYYYMMDDTHHmmss").diff(moment(b.dtstart, "YYYYMMDDTHHmmss")));
+    processedCourses.sort((a, b) => parseDateTime(a.dtstart) - parseDateTime(b.dtstart));
 
-    // Find the first course in September
+    // Define the 1st of September of the current year
+    const currentYear = new Date().getFullYear();
+    const firstOfSeptember = new Date(`${currentYear}-09-01T00:00:00+02:00`); // +02:00 for Europe/Paris timezone during summer
+
+    // Find the first course that occurs on or after the 1st of September
     const septemberStartIndex = processedCourses.findIndex(course => {
-        const courseDate = moment(course.dtstart, "YYYYMMDDTHHmmss");
-        return courseDate.month() === 8; // September is month 8 (0-indexed months in moment.js)
+        const courseDate = parseDateTime(course.dtstart);
+        return courseDate >= firstOfSeptember;
     });
 
     // If the first September course is found, filter from that point onward
@@ -58,7 +60,7 @@ function filterAndRenameCourses(courses) {
 
     const dev_processedCourses = processedCourses.slice(0, 10);
     return processedCourses;
-}
+
 
 router.get('/:class_name', async (req, res) => {
     const class_name = req.params.class_name;
@@ -88,16 +90,15 @@ router.get('/:class_name', async (req, res) => {
                             VISIO: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 },
                             Total: { totalEdt: 0, totalRealized: 0, totalPlanned: 0 }
                         };
-                        const now = moment();
 
                         // Process courses for stats calculation
                         processedCourses.forEach(course => {
                             const batiment = course.batiment || 'Unknown';
                             const startDateTime = parseDateTime(course.dtstart);
                             const endDateTime = parseDateTime(course.dtend);
-                            const durationHours = endDateTime.diff(startDateTime, 'hours', true);
-                            const isRealized = endDateTime.isBefore(now);
-
+                            const durationHours = calculateDuration(startDateTime, endDateTime); // Using native JS duration calculation
+                            const isRealized = endDateTime < new Date(); // Compare with current time
+                        
                             if (stats[batiment]) {
                                 stats[batiment].totalEdt += durationHours;
                                 stats[batiment].totalPlanned += durationHours;
@@ -127,21 +128,22 @@ router.get('/:class_name', async (req, res) => {
                             const subject = course.matiere;
                             const startDateTime = parseDateTime(course.dtstart);
                             const endDateTime = parseDateTime(course.dtend);
-                            const durationHours = endDateTime.diff(startDateTime, 'hours', true);
-                            const isRealized = endDateTime.isBefore(now);
+                            const durationHours = calculateDuration(startDateTime, endDateTime); // Using native JS duration calculation
+                            const isRealized = endDateTime < new Date(); // Compare with current time
                             const isVisio = course.visio;
-                            const sessionStatus = getSessionStatus(startDateTime, endDateTime, now);
+                            const sessionStatus = getSessionStatus(startDateTime, endDateTime, new Date());
 
                             const session = {
-                                date: startDateTime.format("DD/MM/yyyy"),
-                                startHour: startDateTime.format("HH:mm"),
-                                endHour: endDateTime.format("HH:mm"),
+                                date: formatDate(startDateTime), // Use the formatDate helper function
+                                startHour: formatTime(startDateTime), // Use the formatTime helper function
+                                endHour: formatTime(endDateTime), // Use the formatTime helper function
                                 duration: durationHours,
                                 isVisio: isVisio,
                                 status: sessionStatus,
                                 batiment: course.batiment,
                                 salle: course.salle,
                             };
+                            
                             if (isVisio && course.teamslink !== "null") {
                                 session.teamslink = course.teamslink;
                             }
@@ -176,10 +178,10 @@ router.get('/:class_name', async (req, res) => {
                                     subjectEntry.hours.planned += durationHours;
                                 }
                                 subjectEntry.hours.total += durationHours;
-                                if (startDateTime.isBefore(subjectEntry.firstDate)) {
+                                if (startDateTime < subjectEntry.firstDate) {
                                     subjectEntry.firstDate = startDateTime;
                                 }
-                                if (endDateTime.isAfter(subjectEntry.lastDate)) {
+                                if (endDateTime > subjectEntry.lastDate) {
                                     subjectEntry.lastDate = endDateTime;
                                 }
                                 if (isVisio) {
@@ -204,8 +206,8 @@ router.get('/:class_name', async (req, res) => {
                             const ongoing = percentageOfCompletion < 100;
                             return {
                                 subject: key,
-                                firstDate: summary.firstDate.format("DD/MM/yyyy"),
-                                lastDate: summary.lastDate.format("DD/MM/yyyy"),
+                                firstDate: formatDate(summary.firstDate),
+                                lastDate: formatDate(summary.lastDate),
                                 sessions: summary.sessions,
                                 hours: summary.hours,
                                 percentageOfCompletion: Math.floor(percentageOfCompletion),
@@ -259,11 +261,31 @@ router.get('/:class_name', async (req, res) => {
 });
 
 function parseDateTime(dateTimeStr) {
-    const format = "YYYYMMDDHHmmss";
-    // Parse the date in Europe/Paris timezone and consider daylight saving time
-    let date = moment.tz(dateTimeStr,format, "Europe/Paris");
-    
-    return date
+    // Convert from the "YYYYMMDDTHHmmss" format to a valid ISO date string, then parse it
+    const year = dateTimeStr.substring(0, 4);
+    const month = dateTimeStr.substring(4, 6);
+    const day = dateTimeStr.substring(6, 8);
+    const hour = dateTimeStr.substring(9, 11);
+    const minute = dateTimeStr.substring(11, 13);
+    const second = dateTimeStr.substring(13, 15);
+
+    // Construct a valid ISO string with timezone info and parse into Date object
+    return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}+02:00`); // +02:00 for Europe/Paris during DST
+}
+
+// Helper to format time into the desired output format (HH:mm)
+function formatTime(date) {
+    return new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date);
+}
+
+// Helper to format date into the desired output format (DD/MM/yyyy)
+function formatDate(date) {
+    return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+}
+
+function calculateDuration(startDateTime, endDateTime) {
+    const diffMs = endDateTime - startDateTime; // Difference in milliseconds
+    return diffMs / (1000 * 60 * 60); // Convert from milliseconds to hours
 }
 
 function isSimilarEnough(a, b, threshold = 0.8) {
