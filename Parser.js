@@ -56,9 +56,15 @@ async function parseHTMLForWeek(response, date) {
                 }
                 if (cours.salle.startsWith("F")) {
                     cours.salle = cours.salle.replace("F", "");
+                    // cours.etage is first caracter of salle
+                    cours.etage = parseInt(cours.salle.replace("Faure ","").trim()[0]);
+                    cours.salle = cours.salle.replace("Faure ", "");
+                    cours.salle = "Etage " + cours.etage + " Salle " + cours.salle;
                 }
                 if (cours.salle.startsWith("B")) {
-                    cours.salle = cours.salle.replace("B", "").replace("_", " ");
+                    cours.etage = parseInt(cours.salle.replace("B", "").split("_")[0])+1;
+                    cours.salle = cours.salle.replace("B", "").split("_")[1];
+                    cours.salle = "Etage " + cours.etage + " Salle " + cours.salle;
                 }
                 if(cours.salle.includes("SALLE_")){
                     cours.salle = "VISIO";
