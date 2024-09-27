@@ -1,3 +1,4 @@
+const { DateTime } = require('luxon');
 const express = require('express');
 const router = express.Router();
 
@@ -60,6 +61,8 @@ function filterAndRenameCourses(courses) {
 
     const dev_processedCourses = processedCourses.slice(0, 10);
     return processedCourses;
+
+}
 
 
 router.get('/:class_name', async (req, res) => {
@@ -261,7 +264,7 @@ router.get('/:class_name', async (req, res) => {
 });
 
 function parseDateTime(dateTimeStr) {
-    // Convert from the "YYYYMMDDTHHmmss" format to a valid ISO date string, then parse it
+    // Extract components from the string (assumed format: "YYYYMMDDTHHmmss")
     const year = dateTimeStr.substring(0, 4);
     const month = dateTimeStr.substring(4, 6);
     const day = dateTimeStr.substring(6, 8);
@@ -269,8 +272,18 @@ function parseDateTime(dateTimeStr) {
     const minute = dateTimeStr.substring(11, 13);
     const second = dateTimeStr.substring(13, 15);
 
-    // Construct a valid ISO string with timezone info and parse into Date object
-    return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}+02:00`); // +02:00 for Europe/Paris during DST
+    // Use Luxon to create a DateTime object in Europe/Paris timezone
+    return DateTime.fromObject(
+        {
+            year: parseInt(year),
+            month: parseInt(month),
+            day: parseInt(day),
+            hour: parseInt(hour),
+            minute: parseInt(minute),
+            second: parseInt(second),
+        },
+        { zone: 'Europe/Paris' }
+    ).toJSDate(); // Convert to a JavaScript Date object
 }
 
 // Helper to format time into the desired output format (HH:mm)
