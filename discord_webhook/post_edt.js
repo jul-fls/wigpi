@@ -29,7 +29,7 @@ async function main(class_name){
                 await htmlLib.GenerateHTML(class_name.name, $date_str_2, cours_of_the_week)
                     .then(async (result) => {
                         console.log("HTML generated for " + class_name.name);
-                        //save html file in the folder
+
                         await discordLib.post_edt(class_name.webhookid, class_name.webhooktoken, class_name.roleid, $date_str, class_name.name);
                     });
             }else{

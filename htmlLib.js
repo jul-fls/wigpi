@@ -81,8 +81,9 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
         const $tr = $('<tr></tr>');
     
         // Create the time slot cell
-        const $timeCell = $('<td class="p-4 border shadow-neumorphism rounded-lg"></td>').text(timeSlot);
-        $tr.append($timeCell);
+        // const $timeCell = $('<td class="p-4 border-b border-gray-400 rounded-lg w-1/6 text-center"></td>').text(timeSlot);
+        // $tr.append($timeCell);
+        // No need to create a time slot cell as we are removing the "Horaires" column
     
         // Generate course cells for each day (0 = Monday, 4 = Friday)
         for (let day = 0; day <= 4; day++) {
@@ -95,7 +96,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
                 const backgroundColor = hashStringToColor(courseForSlot.matiere);
     
                 // Use Tailwind's arbitrary value syntax for dynamic border color
-                const $courseCell = $(`<td class="shadow-neumorphism rounded-2xl border-[32px] text-center border-transparent bg-[${backgroundColor}]/25"></td>`)
+                const $courseCell = $(`<td class="shadow-neumorphism rounded-2xl border-[32px] text-center border-transparent bg-[${backgroundColor}]/25 w-1/6"></td>`)
                     .attr('rowspan', rowspan)
                     .append(`<span class="flex justify-center font-bold text-4xl mb-6">${courseForSlot.matiere}</span>
                         <div class="flex justify-center">
@@ -105,7 +106,10 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
                                 </span>
                                 <br/>
                                 <span class="flex items-center text-2xl">
-                                    <i class="fa-solid fa-building mr-10"></i>${courseForSlot.batiment} <i class="fa-solid fa-door-open mx-4"></i> ${courseForSlot.salle}
+                                    <i class="fa-solid fa-building mr-10"></i>${courseForSlot.batiment}
+                                </span>
+                                <span class="flex items-center text-2xl">
+                                    <i class="fa-solid fa-door-open mr-8"></i>${courseForSlot.salle}
                                 </span>
                                 <br/>
                                 <span class="flex items-center text-xl">
@@ -131,7 +135,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=2600&height=1300&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=1920&height=1080&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
     try {
         const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
         fs.writeFileSync(process.env.ROOT_PATH + `pngFiles/${classname}.png`, response.data);
