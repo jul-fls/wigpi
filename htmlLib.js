@@ -135,7 +135,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=1920&height=1080&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=1920&height=900&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
     try {
         const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
         fs.writeFileSync(process.env.ROOT_PATH + `pngFiles/${classname}.png`, response.data);
