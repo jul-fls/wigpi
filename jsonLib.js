@@ -37,6 +37,7 @@ function write(type, data, jsonFileName) {
         });
     } else if (type == "event") {
         json = "{\n";
+        json += "\"uid\": \"" + data.uid + "\",\n";
         json += "\"dtstart\": \"" + data.dtstart + "\",\n";
         json += "\"dtend\": \"" + data.dtend + "\",\n";
         json += "\"matiere\": \"" + data.matiere + "\",\n";

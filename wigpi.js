@@ -3,6 +3,7 @@ const cal = require('./calendarLib.js');
 const ics = require('./icsLib.js');
 const json = require('./jsonLib.js');
 const misc = require('./miscLib.js');
+const compare = require('./compareLib.js');
 const fs = require('fs');
 const crypto = require('crypto');
 const fetch = (...args) =>
@@ -177,4 +178,9 @@ function createFakeCoursMaintenances() {
     }
 }
 
-getCoursForAllClasses();
+// make a copy of the jsonFiles folder to a oldJsonFiles folder for future comparison
+fs.cpSync(process.env.ROOT_PATH + "jsonFiles", process.env.ROOT_PATH + "oldJsonFiles", {recursive: true});
+getCoursForAllClasses().then(() => {
+    // After processing courses, run the comparison function
+    compare.compareClasses($classes, process.env.ROOT_PATH);
+});

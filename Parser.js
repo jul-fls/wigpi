@@ -5,6 +5,40 @@ const cheerio = require('cheerio');
 const crypto = require('crypto');
 const urlLib = require('./urlLib.js');
 const miscLib = require('./miscLib');
+
+//create uid for each cours based on matiere and date
+function generateUniqueIdForWeek(courses) {
+    let courseOccurrencesByDate = {};
+
+    // Compte combien de fois chaque cours avec une même matière et date apparaît
+    courses.forEach((cours) => {
+        const courseKey = `${cours.matiere}_${cours.date}`;
+        if (!courseOccurrencesByDate[courseKey]) {
+            courseOccurrencesByDate[courseKey] = 0;
+        }
+        courseOccurrencesByDate[courseKey]++;
+    });
+
+    let occurrenceCountByDate = {}; // Pour compter les occurrences actuelles lors de l'itération
+    courses.forEach((cours) => {
+        const courseKey = `${cours.matiere}_${cours.date}`;
+        
+        // Si c'est la première occurrence, initialise le compteur pour ce cours
+        if (!occurrenceCountByDate[courseKey]) {
+            occurrenceCountByDate[courseKey] = 1;
+        } else {
+            occurrenceCountByDate[courseKey]++;
+        }
+
+        // Ajoute un index d'ordre si le même cours apparaît plusieurs fois à la même date
+        const orderIndex = occurrenceCountByDate[courseKey] > 1 ? `_${occurrenceCountByDate[courseKey]}` : '';
+
+        // Génère l'ID unique basé sur la matière, la date, et l'index d'ordre
+        const uniqueId = `${cours.matiere}_${cours.date}${orderIndex}`;
+        cours.uid = crypto.createHash('md5').update(uniqueId).digest("hex");
+    });
+}
+
 async function parseHTMLForWeek(response, date) {
     const $ = cheerio.load(response);
     if ($('body').text().includes(process.env.WIGOR_NO_COURSE_TEXT)) {
@@ -122,15 +156,17 @@ async function parseHTMLForWeek(response, date) {
                 }
             }
         }
-        //create uid for each cours
-        for ($i = 0; $i < $cleaned_cours_week.length; $i++) {
-            $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof.name;
-            $cleaned_cours_week[$i].uid = crypto.createHash('md5').update($cleaned_cours_week[$i].uid).digest("hex");
-        }
         //remove all the cours that have are visio and between 18:00 and 20:00
         $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
             return !cours.visio || (cours.visio && (parseInt(cours.heure_debut.split(":")[0]) < 18 || parseInt(cours.heure_debut.split(":")[0]) >= 20));
         });
+
+        //create uid for each cours
+        // for ($i = 0; $i < $cleaned_cours_week.length; $i++) {
+        //     $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof.name;
+        //     $cleaned_cours_week[$i].uid = crypto.createHash('md5').update($cleaned_cours_week[$i].uid).digest("hex");
+        // }
+        generateUniqueIdForWeek($cleaned_cours_week);
 
         return $cleaned_cours_week;
     }
