@@ -19,11 +19,15 @@ async function sendDiscordMessage(content) {
     }
 }
 
-// Function to check if a course is in the future
 function isFutureCourse(course) {
     const now = new Date();
-    const courseStartDate = new Date(course.dtstart);
-    return courseStartDate >= now;
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const courseStartDate = parseCourseDate(course.dtstart);
+
+    // Check if the course is in the future or within the last month
+    return courseStartDate >= oneMonthAgo;
 }
 
 // Convert JSON data into an object keyed by `uid`, filtering only future courses
@@ -54,6 +58,48 @@ function normalizeCourse(course) {
     };
 }
 
+// Function to detect and display detailed differences between two course objects
+function detectDetailedDifferences(oldCourse, newCourse) {
+    let differences = [];
+
+    Object.keys(newCourse).forEach(key => {
+        // If the key is an object (e.g., 'prof'), we need to compare its inner properties
+        if (typeof newCourse[key] === 'object' && newCourse[key] !== null) {
+            Object.keys(newCourse[key]).forEach(subKey => {
+                if (oldCourse[key][subKey] !== newCourse[key][subKey]) {
+                    differences.push({
+                        key: `${key}.${subKey}`,
+                        before: oldCourse[key][subKey],
+                        after: newCourse[key][subKey]
+                    });
+                }
+            });
+        } else if (oldCourse[key] !== newCourse[key]) {
+            // Compare primitive values
+            differences.push({
+                key: key,
+                before: oldCourse[key],
+                after: newCourse[key]
+            });
+        }
+    });
+
+    return differences;
+}
+
+function parseCourseDate(dateStr) {
+    // dateStr is in format "YYYYMMDDTHHmmss"
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    const hour = dateStr.substring(9, 11);
+    const minute = dateStr.substring(11, 13);
+    const second = dateStr.substring(13, 15);
+
+    return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+}
+
+
 // Function to detect differences between old and new course data
 function detectDifferences(oldCourses, newCourses) {
     let added = [];
@@ -64,8 +110,15 @@ function detectDifferences(oldCourses, newCourses) {
     Object.keys(newCourses).forEach(uid => {
         if (!oldCourses[uid]) {
             added.push(newCourses[uid]); // New course added
-        } else if (JSON.stringify(oldCourses[uid]) !== JSON.stringify(newCourses[uid])) {
-            modified.push({ before: oldCourses[uid], after: newCourses[uid] }); // Course modified
+        } else {
+            let detailedDifferences = detectDetailedDifferences(oldCourses[uid], newCourses[uid]);
+            if (detailedDifferences.length > 0) {
+                modified.push({
+                    before: oldCourses[uid],
+                    after: newCourses[uid],
+                    differences: detailedDifferences
+                }); // Course modified
+            }
         }
     });
 
@@ -81,66 +134,80 @@ function detectDifferences(oldCourses, newCourses) {
 
 // Main function to compare JSON files for all classes and send Discord messages if changes are detected
 async function compareClasses(classes, rootPath) {
-    let changesDetected = false;
-    let discordMessage = "";
-
     // Compare JSON files for each class
-    classes.forEach(cl => {
-        const oldJsonPath = rootPath + `oldJsonFiles/${cl.name}.json`;
-        const newJsonPath = rootPath + `jsonFiles/${cl.name}.json`;
+    for (const cl of classes) {
+        // if (cl.name === "i2-eisi-dev2") {
+        if (true) {
+            const oldJsonPath = rootPath + `oldJsonFiles/${cl.name}.json`;
+            const newJsonPath = rootPath + `jsonFiles/${cl.name}.json`;
 
-        // Check if both JSON files exist
-        if (fs.existsSync(oldJsonPath) && fs.existsSync(newJsonPath)) {
-            const oldJson = JSON.parse(fs.readFileSync(oldJsonPath, 'utf8')).courses;
-            const newJson = JSON.parse(fs.readFileSync(newJsonPath, 'utf8')).courses;
+            // Check if both JSON files exist
+            if (fs.existsSync(oldJsonPath) && fs.existsSync(newJsonPath)) {
+                try {
+                    const oldJsonData = fs.readFileSync(oldJsonPath, 'utf8');
+                    const newJsonData = fs.readFileSync(newJsonPath, 'utf8');
 
-            // Normalize and map by UID
-            const oldCoursesMap = mapByUid(oldJson);
-            const newCoursesMap = mapByUid(newJson);
+                    if (!oldJsonData || !newJsonData) {
+                        console.log(`Empty JSON file detected for class ${cl.displayname}.`);
+                        continue;
+                    }
 
-            // Detect differences
-            const { added, removed, modified } = detectDifferences(oldCoursesMap, newCoursesMap);
+                    const oldJson = JSON.parse(oldJsonData).courses;
+                    const newJson = JSON.parse(newJsonData).courses;
 
-            if (added.length > 0 || removed.length > 0 || modified.length > 0) {
-                changesDetected = true;
-                discordMessage += `**Changes detected for class ${cl.displayname}:**\n`;
+                    // Normalize and map by UID
+                    const oldCoursesMap = mapByUid(oldJson);
+                    const newCoursesMap = mapByUid(newJson);
 
-                // List added courses
-                if (added.length > 0) {
-                    discordMessage += "Added courses:\n";
-                    added.forEach(course => {
-                        discordMessage += `- ${course.matiere} from ${course.dtstart} to ${course.dtend}\n`;
-                    });
+                    // Detect differences
+                    const { added, removed, modified } = detectDifferences(oldCoursesMap, newCoursesMap);
+
+                    if (added.length > 0 || removed.length > 0 || modified.length > 0) {
+                        let discordMessage = `**Changes detected for class ${cl.displayname}:**\n`;
+
+                        // List added courses
+                        if (added.length > 0) {
+                            discordMessage += "**Added courses:**\n";
+                            added.forEach(course => {
+                                discordMessage += `- **${course.matiere}** from ${course.dtstart} to ${course.dtend}\n`;
+                            });
+                        }
+
+                        // List removed courses
+                        if (removed.length > 0) {
+                            discordMessage += "**Removed courses:**\n";
+                            removed.forEach(course => {
+                                discordMessage += `- **${course.matiere}** from ${course.dtstart} to ${course.dtend}\n`;
+                            });
+                        }
+
+                        // List modified courses with detailed differences
+                        if (modified.length > 0) {
+                            discordMessage += "**Modified courses:**\n";
+                            modified.forEach(change => {
+                                discordMessage += `- **${change.before.matiere}** from ${change.before.dtstart} to ${change.before.dtend}\n`;
+                                discordMessage += `  - **Changes:**\n`;
+                                change.differences.forEach(diff => {
+                                    discordMessage += `    - **${diff.key}**: changed from "${diff.before}" to "${diff.after}"\n`;
+                                });
+                            });
+                        }
+
+                        // Send the message to Discord for this class
+                        await sendDiscordMessage(discordMessage);
+                        console.log(`Changes detected for class ${cl.displayname} and message sent to Discord.`);
+                        console.log(discordMessage);
+                    } else {
+                        console.log(`No changes detected for class ${cl.displayname}.`);
+                    }
+                } catch (error) {
+                    console.error(`Error parsing JSON for class ${cl.displayname}:`, error);
+                    continue; // Skip to the next class if there's an error
                 }
-
-                // List removed courses
-                if (removed.length > 0) {
-                    discordMessage += "Removed courses:\n";
-                    removed.forEach(course => {
-                        discordMessage += `- ${course.matiere} from ${course.dtstart} to ${course.dtend}\n`;
-                    });
-                }
-
-                // List modified courses
-                if (modified.length > 0) {
-                    discordMessage += "Modified courses:\n";
-                    modified.forEach(change => {
-                        discordMessage += `- ${change.before.matiere}: changed from ${change.before.dtstart}-${change.before.dtend} to ${change.after.dtstart}-${change.after.dtend}\n`;
-                    });
-                }
+            } else {
+                console.log(`JSON files for class ${cl.displayname} are missing.`);
             }
-        } else {
-            console.log(`JSON files for class ${cl.displayname} are missing.`);
         }
-    });
-
-    // Send the message to Discord if changes were detected
-    if (changesDetected) {
-        await sendDiscordMessage(discordMessage);
-        console.log("Changes detected and message sent to Discord.");
-        console.log(discordMessage);
-    } else {
-        console.log("No changes detected.");
     }
 }
 
