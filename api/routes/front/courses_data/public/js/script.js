@@ -216,14 +216,17 @@ function refreshData(className) {
         // Add the progress bar
         const module_progress = document.createElement("div");
         module_progress.className =
-          "w-full bg-gray-200 rounded-full overflow-hidden h-2 mb-4"; // Adjusted height for visibility
+          "w-full bg-gray-200 rounded-full overflow-hidden h-6 mb-4"; // Adjusted height for visibility
         module_progress.title = `${item.percentageOfCompletion}% Complété`;
 
         const module_progress_inner = document.createElement("div");
         // Include the classes for the striped and animated background
         module_progress_inner.className =
-          "progress-striped progress-animated bg-secondary h-full rounded-full";
+          "progress-striped progress-animated bg-secondary h-full rounded-full text-center";
         module_progress_inner.style.width = `${item.percentageOfCompletion}%`;
+        if(item.percentageOfCompletion > 0){
+          module_progress_inner.innerText = `${item.percentageOfCompletion}%`;
+        }
         module_progress.appendChild(module_progress_inner);
         module.appendChild(module_progress);
 
