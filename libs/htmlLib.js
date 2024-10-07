@@ -131,14 +131,14 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     });
 
     // Save the generated HTML
-    const outputPath = process.env.ROOT_PATH + `htmlFiles/${classname}.html`;
+    const outputPath = process.env.ROOT_PATH + `output/htmlFiles/${classname}.html`;
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
     const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=1920&height=900&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
     try {
         const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
-        fs.writeFileSync(process.env.ROOT_PATH + `pngFiles/${classname}.png`, response.data);
+        fs.writeFileSync(process.env.ROOT_PATH + `output/pngFiles/${classname}.png`, response.data);
     } catch (error) {
         console.error("Error taking screenshot: ", error);
     }

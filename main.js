@@ -25,8 +25,8 @@ async function getCoursForYear(year, user) {
 }
 
 async function getCoursForClass(user, classname, displayname) {
-    icsFileName = process.env.ROOT_PATH + "icsFiles/" + classname + ".ics.tmp";
-    jsonFileName = process.env.ROOT_PATH + "jsonFiles/" + classname + ".json.tmp";
+    icsFileName = process.env.ROOT_PATH + "output/icsFiles/" + classname + ".ics.tmp";
+    jsonFileName = process.env.ROOT_PATH + "output/jsonFiles/" + classname + ".json.tmp";
     actualYear = (new Date().getFullYear());
     nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
@@ -59,11 +59,11 @@ async function getCoursForClass(user, classname, displayname) {
         });
 
     // Ensure temp files are properly renamed
-    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "icsFiles/");
-    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "jsonFiles/");
+    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
+    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i], process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i].replace(".tmp", ""), (err) => {
+            await fs.rename(process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i], process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i].replace(".tmp", ""), (err) => {
                 if (err) throw err;
                 console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
             });
@@ -71,7 +71,7 @@ async function getCoursForClass(user, classname, displayname) {
     }
     for (let i = 0; i < $jsonFiles.length; i++) {
         if ($jsonFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i], process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i].replace(".tmp", ""), (err) => {
+            await fs.rename(process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i], process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i].replace(".tmp", ""), (err) => {
                 if (err) throw err;
                 console.log("Done writing json file for class " + $jsonFiles[i].replace(".tmp", ""));
             });
@@ -99,14 +99,14 @@ async function getCoursForAllClasses() {
     await new Promise(r => setTimeout(r, 10000));
 
     // move the tmp files to the final ones
-    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "icsFiles/");
-    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "jsonFiles/");
+    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
+    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
 
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
             await fs.promises.rename(
-                process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i], 
-                process.env.ROOT_PATH + "icsFiles/" + $icsFiles[i].replace(".tmp", "")
+                process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i], 
+                process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i].replace(".tmp", "")
             );
             console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
         }
@@ -116,8 +116,8 @@ async function getCoursForAllClasses() {
         if ($jsonFiles[i].includes(".tmp")) {
             const newFileName = $jsonFiles[i].replace(".tmp", "");
             await fs.promises.rename(
-                process.env.ROOT_PATH + "jsonFiles/" + $jsonFiles[i], 
-                process.env.ROOT_PATH + "jsonFiles/" + newFileName
+                process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i], 
+                process.env.ROOT_PATH + "output/jsonFiles/" + newFileName
             );
             console.log("Done writing json file for class " + newFileName);
         }

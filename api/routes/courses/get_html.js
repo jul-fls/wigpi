@@ -15,7 +15,7 @@ router.get('/:class_name', (req, res) => {
         if ($status == 0) {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                let chemin = root_path + "/htmlFiles/" + class_name + ".html";
+                let chemin = root_path + "/output/htmlFiles/" + class_name + ".html";
                 fs.readFile(chemin, 'utf8', function(err, data) {
                     if (err) {
                         res.send("error");

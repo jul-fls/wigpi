@@ -15,7 +15,7 @@ router.get('/:class_name', (req, res) => {
         if($status == 0) {
             if($classes[i].name === class_name) {
                 $status = 1;
-                let chemin = root_path + "/jsonFiles/" + class_name + ".json";
+                let chemin = root_path + "/output/jsonFiles/" + class_name + ".json";
                 fs.readFile(chemin, 'utf8', function(err, data) {
                     if(err) {
                         res.send("error");

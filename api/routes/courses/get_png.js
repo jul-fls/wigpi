@@ -15,7 +15,7 @@ router.get('/:class_name/:timestamp', (req, res) => {
         if($status == 0) {
             if($classes[i].name === class_name){
                 $status = 1;
-                let chemin = root_path + "/pngFiles/" + class_name + ".png";
+                let chemin = root_path + "/output/pngFiles/" + class_name + ".png";
                 res.type('image/png');
                 res.sendFile(chemin);
             }

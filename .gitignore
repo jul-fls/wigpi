@@ -1,10 +1,6 @@
 .env
 node_modules/
-htmlFiles/*
-jsonFiles/*
-oldJsonFiles/*
-icsFiles/*
-pngFiles/*
+output/
 logs/*
 messageIds.json
 api/classes.json

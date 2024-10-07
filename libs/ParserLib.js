@@ -4,7 +4,7 @@ const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
 const urlLib = require('./libs/urlLib.js');
-const miscLib = require('./miscLib');
+const miscLib = require('./libs/miscLib');
 
 //create uid for each cours based on matiere and date
 function generateUniqueIdForWeek(courses) {

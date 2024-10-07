@@ -15,7 +15,7 @@ router.get('/:class_name', (req, res) => {
         if ($status == 0) {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                let chemin = root_path + "/icsFiles/" + class_name + ".ics";
+                let chemin = root_path + "/output/icsFiles/" + class_name + ".ics";
                 fs.readFile(chemin, 'utf8', function(err, data) {
                     if (err) {
                         res.send("error");

@@ -138,8 +138,8 @@ async function compareClasses(classes, rootPath) {
     for (const cl of classes) {
         // if (cl.name === "i2-eisi-dev2") {
         if (true) {
-            const oldJsonPath = rootPath + `oldJsonFiles/${cl.name}.json`;
-            const newJsonPath = rootPath + `jsonFiles/${cl.name}.json`;
+            const oldJsonPath = rootPath + `oldoutput/oldjsonFiles/${cl.name}.json`;
+            const newJsonPath = rootPath + `output/jsonFiles/${cl.name}.json`;
 
             // Check if both JSON files exist
             if (fs.existsSync(oldJsonPath) && fs.existsSync(newJsonPath)) {

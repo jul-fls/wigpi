@@ -77,7 +77,7 @@ router.get('/:class_name', async (req, res) => {
         } else {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                let classFilePath = root_path + "/jsonFiles/" + class_name + ".json";
+                let classFilePath = root_path + "/output/jsonFiles/" + class_name + ".json";
                 if (fs.existsSync(classFilePath)) {
                     let classData = JSON.parse(fs.readFileSync(classFilePath, 'utf8'));
 

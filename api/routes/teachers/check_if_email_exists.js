@@ -4,11 +4,10 @@ const router = express.Router();
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const miscLib = require('../../../miscLib');
+const miscLib = require('../../../libs/miscLib');
 let root_path = process.env.root_path || process.cwd();
 
 router.get('/:email', async (req, res) => {
-    console.log("Checking if email exists...");
     const email = req.params.email;
     let data = { "exists": false }; // Initialize data as an object
     // Check if the email exists
