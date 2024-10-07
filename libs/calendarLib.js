@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 const dt = require('./libs/DateTimeLib.js');
-const parser = require('./Parser.js');
+const parser = require('./libs/ParserLib.js');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
 var interval = 1; //ms
@@ -22,7 +22,8 @@ async function getCalendarForYear(year, user) {
                 await getCalendarForWeek(base_url, user, weeks[i])
                     .then((cours_of_the_week) => {
                         cours_of_the_year.push(cours_of_the_week);
-                    });
+                    }
+                );
             }
         });
     return cours_of_the_year;
