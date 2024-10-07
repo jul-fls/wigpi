@@ -6,7 +6,7 @@ oldJsonFiles/
 icsFiles/
 pngFiles/
 hashFiles/
-messageIds/
+messageIds.json
 servers/
 logs/
 api/classes.json

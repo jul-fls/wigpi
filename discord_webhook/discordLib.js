@@ -7,6 +7,35 @@ const { Webhook } = require('simple-discord-webhooks');
 const FormData = require('form-data');
 const form = new FormData();
 
+function readMessageIds() {
+    try {
+        const data = fs.readFileSync(process.env.ROOT_PATH + "messageIds.json", 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        // Return empty array if file doesn't exist or is unreadable
+        return [];
+    }
+}
+
+function writeMessageIds(messageIds) {
+    fs.writeFileSync(process.env.ROOT_PATH + "messageIds.json", JSON.stringify(messageIds, null, 2), 'utf8');
+}
+
+function getMessageIdByClassname(messageIds, classname) {
+    const found = messageIds.find(entry => entry.classname === classname);
+    return found ? found.message_id : null;
+}
+
+function setMessageIdByClassname(messageIds, classname, message_id) {
+    const index = messageIds.findIndex(entry => entry.classname === classname);
+    if (index !== -1) {
+        messageIds[index].message_id = message_id;
+    } else {
+        messageIds.push({ classname, message_id });
+    }
+    writeMessageIds(messageIds);
+}
+
 async function delete_message(webhook_id, webhook_token, message_id, classname) {
     fetch(process.env.DISCORD_API_BASE_URL + webhook_id + '/' + webhook_token + '/messages/' + message_id, {
             method: 'DELETE'
@@ -17,7 +46,7 @@ async function delete_message(webhook_id, webhook_token, message_id, classname) 
             } else {
                 console.log("Error deleting message for class " + classname);
             }
-        })
+        });
 }
 
 async function post_message(webhook_id, webhook_token, role_id, date, classname) {
@@ -63,44 +92,35 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
         .then((response) => {
             //if the message is sent
             if (response.id != undefined) {
-                fs.writeFile(process.env.ROOT_PATH + "messageIds/" + classname + ".txt", response.id, (err) => {
-                    if (err) {
-                        console.log("Erreur lors de l'écriture du message id pour la classe " + classname);
-                    } else {
-                        console.log("Message ID saved for class " + classname);
-                    }
-                });
+                let messageIds = readMessageIds();
+                setMessageIdByClassname(messageIds, classname, response.id);
+                console.log("Message ID saved for class " + classname);
             }
         })
         .catch((err) => {
             console.log("Erreur lors de l'envoi du message pour la classe " + classname);
             console.error(err);
-        })
+        });
 }
+
 async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
     console.log("Posting message for class " + classname);
-    fs.readFile(process.env.ROOT_PATH + "messageIds/" + classname + ".txt", 'utf8', async function(err, message_id) {
-        if (err) {
-            fs.writeFile(process.env.ROOT_PATH + "messageIds/" + classname + ".txt", '', (err) => {
-                if (err) {
-                    console.log(err);
-                }
-            });
-        } else {
-            //if the file is not empty
-            if (message_id != '') {
-                await delete_message(webhook_id, webhook_token, message_id, classname);
-            }
-            await post_message(webhook_id, webhook_token, role_id, date, classname)
-                .then(() => {
-                    console.log("Message posted for class " + classname);
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
-        }
-    });
+    let messageIds = readMessageIds();
+    let message_id = getMessageIdByClassname(messageIds, classname);
+
+    if (message_id) {
+        await delete_message(webhook_id, webhook_token, message_id, classname);
+    }
+
+    await post_message(webhook_id, webhook_token, role_id, date, classname)
+        .then(() => {
+            console.log("Message posted for class " + classname);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 }
+
 module.exports = {
     post_edt
 };
