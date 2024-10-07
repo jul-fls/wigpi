@@ -1,10 +1,10 @@
 require('dotenv').config();
 var fs = require('fs');
 var path = require('path');
-var htmlLib = require('../htmlLib.js');
-const cal = require('../calendarLib.js');
+var htmlLib = require('../libs/htmlLib.js');
+const cal = require('../libs/calendarLib.js');
 var discordLib = require('./discordLib.js');
-var miscLib = require('../miscLib.js');
+var miscLib = require('../libs/miscLib.js');
 const $classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH+"api/classes.json", 'utf8'));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function main(class_name){

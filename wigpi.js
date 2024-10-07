@@ -1,9 +1,9 @@
 require('dotenv').config();
-const cal = require('./calendarLib.js');
-const ics = require('./icsLib.js');
-const json = require('./jsonLib.js');
-const misc = require('./miscLib.js');
-const compare = require('./compareLib.js');
+const cal = require('./libs/calendarLib.js');
+const ics = require('./libs/icsLib.js');
+const json = require('./libs/jsonLib.js');
+const misc = require('./libs/miscLib.js');
+const compare = require('./libs/compareLib.js');
 const fs = require('fs');
 const crypto = require('crypto');
 const fetch = (...args) =>
