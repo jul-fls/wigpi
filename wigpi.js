@@ -27,7 +27,6 @@ async function getCoursForYear(year, user) {
 async function getCoursForClass(user, classname, displayname) {
     icsFileName = process.env.ROOT_PATH + "icsFiles/" + classname + ".ics.tmp";
     jsonFileName = process.env.ROOT_PATH + "jsonFiles/" + classname + ".json.tmp";
-    hashFileName = process.env.ROOT_PATH + "hashFiles/" + classname + ".md5";
     actualYear = (new Date().getFullYear());
     nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
@@ -80,17 +79,6 @@ async function getCoursForClass(user, classname, displayname) {
     }
 }
 
-async function createHashFile(jsonFileName, hashFileName) {
-    data = fs.readFileSync(jsonFileName);
-    if (data) {
-        const hash = crypto.createHash('md5').update(data).digest('hex');
-        await fs.writeFile(hashFileName, hash, (err) => {
-            if (err) throw err;
-            console.log(`Hash saved to ${hashFileName}`);
-        });
-    }
-}
-
 async function getCoursForAllClasses() {
     for (let i = 0; i < $classes.length; i++) {
         $date = new Date();
@@ -132,12 +120,6 @@ async function getCoursForAllClasses() {
                 process.env.ROOT_PATH + "jsonFiles/" + newFileName
             );
             console.log("Done writing json file for class " + newFileName);
-
-            // After renaming, create the hash file
-            await createHashFile(
-                process.env.ROOT_PATH + "jsonFiles/" + newFileName, 
-                process.env.ROOT_PATH + "hashFiles/" + newFileName.replace(".json", ".md5")
-            );
         }
     }
 
