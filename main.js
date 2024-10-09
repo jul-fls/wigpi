@@ -161,7 +161,7 @@ function createFakeCoursMaintenances() {
 }
 
 // make a copy of the jsonFiles folder to a oldJsonFiles folder for future comparison
-fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldJsonFiles", {recursive: true});
+fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldjsonFiles", {recursive: true});
 getCoursForAllClasses().then(() => {
     // After processing courses, run the comparison function
     compare.compareClasses($classes, process.env.ROOT_PATH);

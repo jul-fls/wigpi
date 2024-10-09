@@ -56,14 +56,16 @@ async function parseHTMLForWeek(response, date) {
             if (cours.salle.includes("DISTANCIEL")) {
                 cours.visio = true;
             }
-            cours.matiere = cours.matiere.toLowerCase().replace("visio","").replace("distanciel","").trim().replace(/^./, char => char.toUpperCase()).replaceAll(".","").replaceAll(","," ") 
+            cours.matiere = cours.matiere.toLowerCase().replace("visio", "").replace("distanciel", "").trim().replace(/^./, char => char.toUpperCase()).replaceAll(".", "").replaceAll(",", " ");
             cours.prof = {
                 name: "",
                 email: ""
             };
-            cours.prof.name = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[0].replace(/(\r\n|\n|\r)/gm, " ").replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase() });
-            cours.prof.name = cours.prof.name.replace(/epsi/gi,"").trim();
-            if(cours.prof.name != ""){
+            cours.prof.name = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[0].replace(/(\r\n|\n|\r)/gm, " ").replace(/\w\S*/g, function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+            cours.prof.name = cours.prof.name.replace(/epsi/gi, "").trim();
+            if (cours.prof.name != "") {
                 cours.prof.email = await miscLib.EpsiNameToEmail(cours.prof.name);
             }
             cours.annee = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
@@ -71,7 +73,9 @@ async function parseHTMLForWeek(response, date) {
             cours.heure_debut = cours.horaires.split(" - ")[0];
             cours.heure_fin = cours.horaires.split(" - ")[1];
             cours.salle = $($cours_week[$i].children[0].children[1].children[0].children[0].children[2].children[1]).text().replace("Salle:", "");
-            if(cours.salle) {
+            
+            // Process the room information
+            if (cours.salle) {
                 let salleParts = cours.salle.split("(");
                 if (salleParts.length > 1) {
                     let batimentParts = salleParts[1].split(")");
@@ -84,31 +88,51 @@ async function parseHTMLForWeek(response, date) {
                         }
                     }
                 }
+
                 cours.salle = salleParts[0].trim();
-                if (cours.salle.startsWith("M: ")) {
-                    cours.salle = cours.salle.replace("M: ", "");
-                }
-                if (cours.salle.startsWith("F")) {
+                
+                // Check if salle starts with "M:" and handle multiple rooms
+                if (cours.salle.startsWith("M")) {
+                    let multiSalles = cours.salle.replace("M: ", "").split(", ");
+                    let firstBatiment = null;
+
+                    multiSalles = multiSalles.map((salle) => {
+                        let parsedSalle = salle.trim();
+
+                        if (parsedSalle.startsWith("F")) {
+                            let etage = parseInt(parsedSalle[1]);
+                            parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
+                            if (!firstBatiment) firstBatiment = "Faure";
+                        } else if (parsedSalle.startsWith("B")) {
+                            let etage = parseInt(parsedSalle[1])+1;
+                            parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
+                            if (!firstBatiment) firstBatiment = "Bruges";
+                        }
+
+                        return parsedSalle;
+                    });
+
+                    multiSalles.sort(); // Sort by batiment alphabetically
+                    cours.salle = multiSalles.join(", ");
+                    cours.batiment = firstBatiment; // Only consider the first batiment
+                } else if (cours.salle.startsWith("F")) {
+                    // Process Faure building
                     cours.salle = cours.salle.replace("F", "");
-                    // cours.etage is first caracter of salle
-                    cours.etage = parseInt(cours.salle.replace("Faure ","").trim()[0]);
-                    cours.salle = cours.salle.replace("Faure ", "");
-                    cours.salle = "Etage " + cours.etage + " Salle " + cours.salle;
-                }
-                if (cours.salle.startsWith("B")) {
-                    cours.etage = parseInt(cours.salle.replace("B", "").split("_")[0])+1;
-                    cours.salle = cours.salle.replace("B", "").split("_")[1];
-                    cours.salle = "Etage " + cours.etage + " Salle " + cours.salle;
-                }
-                if(cours.salle.includes("SALLE_")){
+                    let etage = parseInt(cours.salle[0]);
+                    cours.salle = `Etage ${etage} Salle ${cours.salle.slice(1).trim()}`;
+                    cours.batiment = "Faure";
+                } else if (cours.salle.startsWith("B")) {
+                    // Process Bruges building
+                    cours.salle = cours.salle.replace("B", "");
+                    let etage = parseInt(cours.salle[0])+1;
+                    cours.salle = `Etage ${etage} Salle ${cours.salle.slice(1).trim()}`;
+                    cours.batiment = "Bruges";
+                } else if (cours.salle.includes("SALLE_")) {
                     cours.salle = "VISIO";
                 }
+                cours.salle = cours.salle.replaceAll("_", "");
             }
             
-            // if ($($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href") != undefined) {
-            //     cours.lien_teams = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0].children[1].children[0]).attr("href").split("&Tel=")[0].replace("https://ws-edt-cd.wigorservices.net/WebPsDyn.aspx?Action=posEDTLMS",process.env.WIGOR_BASE_URL);
-            //     cours.lien_teams = await urlLib.getMetaRefreshUrl(cours.lien_teams);
-            // }
             cours.position = parseInt($cours_week[$i].attribs.style.split("left:")[1].split("%")[0]);
             switch (true) {
                 case cours.position >= parseInt(process.env.MONDAY_LEFT) && cours.position < parseInt(process.env.TUESDAY_LEFT):
@@ -161,14 +185,10 @@ async function parseHTMLForWeek(response, date) {
             return !cours.visio || (cours.visio && (parseInt(cours.heure_debut.split(":")[0]) < 18 || parseInt(cours.heure_debut.split(":")[0]) >= 20));
         });
 
-        //create uid for each cours
-        // for ($i = 0; $i < $cleaned_cours_week.length; $i++) {
-        //     $cleaned_cours_week[$i].uid = $cleaned_cours_week[$i].date + $cleaned_cours_week[$i].heure_debut + $cleaned_cours_week[$i].heure_fin + $cleaned_cours_week[$i].salle + $cleaned_cours_week[$i].prof.name;
-        //     $cleaned_cours_week[$i].uid = crypto.createHash('md5').update($cleaned_cours_week[$i].uid).digest("hex");
-        // }
         generateUniqueIdForWeek($cleaned_cours_week);
 
         return $cleaned_cours_week;
     }
 }
+
 module.exports = { parseHTMLForWeek: parseHTMLForWeek };
