@@ -1,0 +1,12 @@
+{
+    "keys":[
+        {
+            "name": "key1",
+            "value": "37a61b31-b67b-4d83-b201-71bbb7479e43",
+            "generateDate": "2024-10-20T16:50:00.000Z",
+            "generatedFor": "key1",
+            "description": "This key is a sample key for testing",
+            "status": "active"
+        }
+    ]
+}

@@ -22,7 +22,8 @@ const coursesRouteGetPng = require('./routes/courses/get_png');
 const coursesRouteGetHtml = require('./routes/courses/get_html');
 const dataRouteCoursesDataAPI = require('./routes/data/api/courses_data_api');
 const teachersRouteCheckIfEmailExists = require('./routes/teachers/check_if_email_exists');
-const testCasCallbackRoute = require('./routes/test_cas/callback'); // TEST CAS CALLBACK
+const systemRouteRefreshEdt = require('./routes/system/refresh_edt');
+const systemRoutePostDiscordEdt = require('./routes/system/post_discord_edt');
 
 app.use('/api/classes/get_json', classesRouteGetJson);
 app.use('/api/courses/get_ics', coursesRouteGetIcs);
@@ -31,7 +32,8 @@ app.use('/api/courses/get_png', coursesRouteGetPng);
 app.use('/api/courses/get_html', coursesRouteGetHtml);
 app.use('/api/data/courses_data', dataRouteCoursesDataAPI);
 app.use('/api/teachers/check_if_email_exists', teachersRouteCheckIfEmailExists);
-app.use('/api/test_cas/callback', testCasCallbackRoute); // TEST CAS CALLBACK
+app.use('/api/system/refresh_edt', systemRouteRefreshEdt);
+app.use('/api/system/post_discord_edt', systemRoutePostDiscordEdt);
 //// API ROUTES ////
 
 

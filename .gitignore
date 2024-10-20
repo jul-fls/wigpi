@@ -4,3 +4,4 @@ output/
 logs/*
 messageIds.json
 api/classes.json
+api/apiKeys.json

@@ -29,7 +29,7 @@
             }
           },
           "tags": [
-            "Generic"
+            "Classes"
           ]
         }
       },
@@ -55,12 +55,9 @@
               }
             },
             "tags": [
-              "Generic"
+              "Courses"
             ]
-          },
-            "tags": [
-                "Generic"
-            ]
+          }
         },
         "/courses/get_png/{class_name}/{randomString}": {
             "get": {
@@ -97,7 +94,7 @@
                     }
                 },
                 "tags": [
-                    "Generic"
+                    "Courses"
                 ]
             }
         },
@@ -127,7 +124,7 @@
                     }
                 },
                 "tags": [
-                    "Generic"
+                    "Courses"
                 ]
             }
         },
@@ -157,7 +154,7 @@
                     }
                 },
                 "tags": [
-                    "Generic"
+                    "Courses"
                 ]
             }
         },
@@ -183,7 +180,7 @@
                       }
                     },
                 "tags": [
-                    "Generic"
+                    "Courses Data"
                 ]
             }
         },
@@ -209,9 +206,147 @@
                     }
                   },
               "tags": [
-                  "Generic"
+                  "Misc"
               ]
           }
+      },
+      "/system/refresh_edt": {
+        "get": {
+          "summary": "GET /system/refresh_edt",
+          "operationId": "RefreshEDT",
+          "parameters": [
+            {
+              "name": "apiKey",
+              "in": "query",
+              "required": true,
+              "type": "string",
+              "format": "string",
+              "description": "API key to authenticate the request"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "EDT refresh triggered successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "EDT refresh triggered successfully"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Invalid or inactive API key",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Invalid or inactive API key"
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "EDT refresh already in progress",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "EDT refresh already in progress"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Failed to log request",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Failed to log request"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "System"
+          ]
+        }
+      },
+      "/system/post_discord_edt": {
+        "get": {
+          "summary": "Trigger posting EDT to Discord",
+          "description": "This route triggers the process of posting the course schedule (EDT) to Discord for all classes. It requires a valid API key.",
+          "operationId": "PostDiscordEDT",
+          "parameters": [
+            {
+              "name": "apiKey",
+              "in": "query",
+              "required": true,
+              "type": "string",
+              "description": "API key required to authorize the request"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "EDT post triggered successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Post EDT triggered successfully"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Invalid or inactive API key",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Invalid or inactive API key"
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "Post EDT already in progress",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Post EDT already in progress"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string",
+                    "example": "Error during EDT post"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "System"
+          ]
+        }
       }
     },
     "definitions": {

@@ -27,7 +27,13 @@ async function getCoursForYear(year, user) {
 async function getCoursForClass(user, classname, displayname) {
     icsFileName = process.env.ROOT_PATH + "output/icsFiles/" + classname + ".ics.tmp";
     jsonFileName = process.env.ROOT_PATH + "output/jsonFiles/" + classname + ".json.tmp";
-    actualYear = (new Date().getFullYear());
+    const now = new Date();
+    // if now is after or the 1st of september and before the 1st of january, the actual year is the current year, and if now is after or the 1st of january and before the 1st of september, the actual year is the current year - 1
+    if (now.getMonth() >= 8) {
+        actualYear = now.getFullYear();
+    } else {
+        actualYear = now.getFullYear() - 1;
+    }
     nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
     json.write("start", displayname, jsonFileName);
@@ -160,9 +166,18 @@ function createFakeCoursMaintenances() {
     }
 }
 
-// make a copy of the jsonFiles folder to a oldJsonFiles folder for future comparison
-fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldjsonFiles", {recursive: true});
-getCoursForAllClasses().then(() => {
-    // After processing courses, run the comparison function
-    compare.compareClasses($classes, process.env.ROOT_PATH);
-});
+async function refreshEDT() {
+    // Main function to trigger refresh
+    // Copy the old json files to a backup folder for comparison
+    // create a temp lock file to prevent multiple refreshes at the same time
+    fs.writeFileSync(process.env.ROOT_PATH + "output/refresh.lock", "1");
+    fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldjsonFiles", {recursive: true});
+    await getCoursForAllClasses().then(() => {
+        compare.compareClasses($classes, process.env.ROOT_PATH);
+        fs.writeFileSync(process.env.ROOT_PATH + "output/refresh.lock", "0");
+    });
+}
+
+module.exports = {
+    refreshEDT
+};
