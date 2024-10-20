@@ -8,7 +8,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
-$json = fs.readFileSync(process.env.ROOT_PATH + "api/classes.json");
+$json = fs.readFileSync(process.env.ROOT_PATH + "config/classes.json");
 $classes = JSON.parse($json);
 async function getCoursForYear(year, user) {
     await cal.getCalendarForYear(year, user)

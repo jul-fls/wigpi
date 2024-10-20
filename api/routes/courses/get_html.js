@@ -8,7 +8,7 @@ let root_path = process.env.root_path || process.cwd();
 
 router.get('/:class_name', (req, res) => {
     const class_name = req.params.class_name;
-    $classes = fs.readFileSync(root_path + "/api/classes.json", 'utf8');
+    $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
     $classes = JSON.parse($classes);
     $status = 0;
     for (var i = 0; i < $classes.length; i++) {

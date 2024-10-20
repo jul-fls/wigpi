@@ -7,7 +7,7 @@ const path = require('path');
 let root_path = process.env.root_path || process.cwd();
 
 router.get('/', (req, res) => {
-    const json = fs.readFileSync(root_path + "/api/classes.json", 'utf8'); // Make sure to define root_path correctly
+    const json = fs.readFileSync(root_path + "/config/classes.json", 'utf8'); // Make sure to define root_path correctly
     const classes = JSON.parse(json);
     const data = { classes: [] }; // Initialize data as an object
 

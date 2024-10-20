@@ -9,7 +9,7 @@ const form = new FormData();
 
 function readMessageIds() {
     try {
-        const data = fs.readFileSync(process.env.ROOT_PATH + "output/messageIds.json", 'utf8');
+        const data = fs.readFileSync(process.env.ROOT_PATH + "output/config/messageIds.json", 'utf8');
         return JSON.parse(data);
     } catch (err) {
         // Return empty array if file doesn't exist or is unreadable
@@ -18,7 +18,7 @@ function readMessageIds() {
 }
 
 function writeMessageIds(messageIds) {
-    fs.writeFileSync(process.env.ROOT_PATH + "output/messageIds.json", JSON.stringify(messageIds, null, 2), 'utf8');
+    fs.writeFileSync(process.env.ROOT_PATH + "output/config/messageIds.json", JSON.stringify(messageIds, null, 2), 'utf8');
 }
 
 function getMessageIdByClassname(messageIds, classname) {

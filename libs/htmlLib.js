@@ -1,6 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
-const axios = require('axios');
+const fetch = (...args) =>
+    import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const cheerio = require('cheerio');
 
 // Function to hash a string (like matiere) into a color
@@ -135,10 +136,11 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=1920&height=900&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=${process.env.PNG_WIDTH}&height=${process.env.PNG_HEIGHT}&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
     try {
-        const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
-        fs.writeFileSync(process.env.ROOT_PATH + `output/pngFiles/${classname}.png`, response.data);
+        const response = await fetch(screenshotUrl);
+        const buffer = await response.arrayBuffer();
+        fs.writeFileSync(process.env.ROOT_PATH + `output/pngFiles/${classname}.png`, Buffer.from(buffer));
     } catch (error) {
         console.error("Error taking screenshot: ", error);
     }

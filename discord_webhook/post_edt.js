@@ -5,7 +5,7 @@ const htmlLib = require('../libs/htmlLib.js');
 const cal = require('../libs/calendarLib.js');
 const discordLib = require('./discordLib.js');
 const miscLib = require('../libs/miscLib.js');
-const $classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH + "api/classes.json", 'utf8'));
+const $classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH + "config/classes.json", 'utf8'));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function getNextMondayOrPreviousMonday() {

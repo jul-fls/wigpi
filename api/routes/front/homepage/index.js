@@ -7,7 +7,7 @@ const path = require('path');
 let root_path = process.env.root_path || process.cwd();
 
 router.get('/', (req, res) => {
-    $classes = fs.readFileSync(root_path + "/api/classes.json", 'utf8');
+    $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
     $classes = JSON.parse($classes);
     $html = fs.readFileSync(root_path + "/api/routes/front/homepage/index.html", 'utf8');
     $data = [];

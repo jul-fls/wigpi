@@ -2,6 +2,6 @@
 node_modules/
 output/
 logs/*
-messageIds.json
-api/classes.json
-api/apiKeys.json
+config/messageIds.json
+config/classes.json
+config/apiKeys.json

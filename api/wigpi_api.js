@@ -5,7 +5,7 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const app = express();
-const port = parseInt(process.env.API_PORT) || 3000;
+const port = parseInt(process.env.PORT) || 3000;
 let root_path = process.env.root_path || process.cwd();
 
 //// DOCS ROUTE ////
@@ -51,5 +51,5 @@ app.use('/api/front/courses_data/public', express.static(path.join(__dirname, 'r
 
 // APP LISTEN //
 app.listen(port, () => {
-    console.log(`Wigpi api is listening at http://localhost:${port}/api`)
+    console.log(`Wigpi api is listening at ${process.env.EXTERNAL_DOMAIN}/api`);
 })

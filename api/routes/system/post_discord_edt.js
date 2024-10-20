@@ -7,7 +7,7 @@ const { postEDTForAllClasses } = require('../../../discord_webhook/post_edt'); /
 require('dotenv').config();
 
 // Load API keys
-const apiKeysFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'api/apiKeys.json');
+const apiKeysFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'config/apiKeys.json');
 let apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
 
 // Function to redirect logs to a specific file
