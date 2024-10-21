@@ -1,6 +1,11 @@
 .env
 node_modules/
-output/
+output/htmlFiles/*
+output/icsFiles/*
+output/jsonFiles/*
+output/oldjsonFiles/*
+output/pngFiles/*
+output/*.lock
 logs/*
 config/messageIds.json
 config/classes.json
