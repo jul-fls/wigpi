@@ -5,6 +5,8 @@ function normalizeString(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+const MAX_RETRIES = parseInt(process.env.MS_ONLINE_MAX_RETRIES, 10) || 3;
+
 async function EpsiNameToEmail(name) {
     // if name is less than 5 characters or is empty, return an empty string
     if (name.length < 5 || !name) {
@@ -13,9 +15,9 @@ async function EpsiNameToEmail(name) {
     const max_characters_threshold = 20;
     const mailDomains = {
         "@mail-formateur.net": [],
-        "@reseau-cd.fr": ["guerineau", "hivert", "sauvage"],
+        "@reseau-cd.fr": ["hivert"],
         "@reseau-cd.com": ["abadiebiscay"],
-        "@campus-cd.com": ["berthellot", "eiche", "jambor", "perrin", "lelan", "garcia", "bermond"],
+        "@campus-cd.com": ["eiche", "jambor", "lelan", "garcia", "bermond","chesneau"],
     };
     const predeterminedEmails = {
         // Pattern: "part of name": "predetermined email"
@@ -23,6 +25,7 @@ async function EpsiNameToEmail(name) {
         "toix": "florian.toix1@mail-formateur.net",
         "ladrat": "geoffroy.ladrat1@mail-formateur.net",
         "pichon": "olivier.pichon1@mail-formteur.net",
+        "berthellot": "laura.berthellot1@campus-cd.com",
     };
 
     // Normalize the name to remove accents
@@ -79,18 +82,33 @@ async function EpsiNameToEmail(name) {
     }
 }
 
-async function check_if_o365_user_exists(email){
+// Implement retry mechanism for Microsoft Online request
+async function check_if_o365_user_exists(email, retries = MAX_RETRIES) {
     const url = "https://login.microsoftonline.com/common/GetCredentialType?mkt=fr-FR";
-    const body = {"Username":email};
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    return !data.IfExistsResult;
+    const body = { "Username": email };
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            console.log(`Attempt ${attempt}: Checking if O365 user exists for ${email}...`);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+            return !data.IfExistsResult; // Return true if the user exists, false otherwise
+        } catch (error) {
+            if (attempt < retries) {
+                console.warn(`Attempt ${attempt} failed. Retrying...`);
+            } else {
+                console.error('Max retries reached. Failed to check O365 user existence.');
+                throw new Error('Failed to check O365 user existence after maximum retries');
+            }
+        }
+    }
 }
 
 async function getCookiesForUser(user) {
