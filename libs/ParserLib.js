@@ -39,7 +39,7 @@ function generateUniqueIdForWeek(courses) {
     });
 }
 
-async function parseHTMLForWeek(response, date) {
+async function parseHTMLForWeek(response, date, groupNumber) {
     const $ = cheerio.load(response);
     if ($('body').text().includes(process.env.WIGOR_NO_COURSE_TEXT)) {
         console.log("Pas de cours la semaine du " + date + " !");
@@ -68,6 +68,21 @@ async function parseHTMLForWeek(response, date) {
             if (cours.prof.name != "") {
                 cours.prof.email = await miscLib.EpsiNameToEmail(cours.prof.name);
             }
+            cours.groupNumber = (() => {
+                const text = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html();
+                const afterSpan = text.split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
+                const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+            
+                // Check if the string contains "transversales"
+                const transversalesIndex = cleanedText.indexOf("Transversales");
+                if (transversalesIndex !== -1) {
+                    // Extract the number right after "transversales"
+                    const match = cleanedText.substring(transversalesIndex).match(/Transversales(\d)/);
+                    return match ? match[1] : "0";
+                } else {
+                    return "0";
+                }
+            })();
             cours.annee = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
             cours.horaires = $($cours_week[$i].children[0].children[1].children[0].children[0].children[2].children[0]).text();
             cours.heure_debut = cours.horaires.split(" - ")[0];
@@ -165,7 +180,9 @@ async function parseHTMLForWeek(response, date) {
             }
             cours.dtstart = cours.date.split("/")[2] + cours.date.split("/")[1] + cours.date.split("/")[0] + "T" + cours.heure_debut.replace(":", "") + "00";
             cours.dtend = cours.date.split("/")[2] + cours.date.split("/")[1] + cours.date.split("/")[0] + "T" + cours.heure_fin.replace(":", "") + "00";
-            $cleaned_cours_week.push(cours);
+            if(groupNumber === cours.groupNumber) {
+                $cleaned_cours_week.push(cours);
+            }
         }
         $cleaned_cours_week.sort(function(a, b) {
             return new Date(a.date) - new Date(b.date);

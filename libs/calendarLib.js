@@ -17,9 +17,9 @@ async function getCalendarForYear(year, user) {
     const cours_of_the_year = [];
     await sleep(interval)
         .then(async () => {
-            for (let i = 0; i < weeks.length; i++) {
+            for (const week of weeks) {
                 const base_url = process.env.WIGOR_BASE_URL;
-                await getCalendarForWeek(base_url, user, weeks[i])
+                await getCalendarForWeek(base_url, user, week)
                     .then((cours_of_the_week) => {
                         cours_of_the_year.push(cours_of_the_week);
                     }
@@ -60,7 +60,7 @@ async function getCalendarForWeek(base_url, user, date) {
     //     }
     //     console.log("The debugHTML file was saved!");
     // });
-    return await parser.parseHTMLForWeek(responseBody, date);
+    return await parser.parseHTMLForWeek(responseBody, date, user.groupNumber);
 }
 
 module.exports = {
