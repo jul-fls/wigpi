@@ -7,9 +7,12 @@ const { Webhook } = require('simple-discord-webhooks');
 const FormData = require('form-data');
 const form = new FormData();
 
+// Charger les classes depuis le fichier JSON
+const classes = JSON.parse(fs.readFileSync(process.env.ROOT_PATH + "config/classes.json", 'utf8'));
+
 function readMessageIds() {
     try {
-        const data = fs.readFileSync(process.env.ROOT_PATH + "output/config/messageIds.json", 'utf8');
+        const data = fs.readFileSync(process.env.ROOT_PATH + "output/messageIds.json", 'utf8');
         return JSON.parse(data);
     } catch (err) {
         // Return empty array if file doesn't exist or is unreadable
@@ -18,7 +21,7 @@ function readMessageIds() {
 }
 
 function writeMessageIds(messageIds) {
-    fs.writeFileSync(process.env.ROOT_PATH + "output/config/messageIds.json", JSON.stringify(messageIds, null, 2), 'utf8');
+    fs.writeFileSync(process.env.ROOT_PATH + "output/messageIds.json", JSON.stringify(messageIds, null, 2), 'utf8');
 }
 
 function getMessageIdByClassname(messageIds, classname) {
@@ -49,7 +52,7 @@ async function delete_message(webhook_id, webhook_token, message_id, classname) 
         });
 }
 
-async function post_message(webhook_id, webhook_token, role_id, date, classname) {
+async function post_message(webhook_id, webhook_token, role_id, date, classname, groupNumber) {
     const hook = new Webhook(process.env.DISCORD_API_BASE_URL + webhook_id + "/" + webhook_token, "EDT", process.env.DISCORD_IMAGE);
     $refresh_date = new Date();
     $refresh_date_str = ('0' + $refresh_date.getDate()).slice(-2) + "/" + ('0' + ($refresh_date.getMonth() + 1)).slice(-2) + "/" + $refresh_date.getFullYear() + " à " + ('0' + $refresh_date.getHours()).slice(-2) + ":" + ('0' + $refresh_date.getMinutes()).slice(-2) + ":" + ('0' + $refresh_date.getSeconds()).slice(-2);
@@ -85,6 +88,22 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
             }
         ]
     };
+
+    // Ajoutez les liens vers les canaux Discord si groupNumber est 0
+    if (groupNumber === 0) {
+        classes.forEach(cls => {
+            if (cls.user.groupNumber !== 0) {
+                $embed.fields.push(
+                    {
+                        "name": `EDT ${cls.displayname}`,
+                        "value": `<#${cls.channelid}>`,
+                        "inline": false
+                    }
+                );
+            }
+        });
+    }
+
     $embeds.push($embed);
     // $content = "<@&" + role_id + ">";
     $content = "";
@@ -103,7 +122,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname)
         });
 }
 
-async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
+async function post_edt(webhook_id, webhook_token, role_id, channel_id, date, classname, groupNumber) {
     console.log("Posting message for class " + classname);
     let messageIds = readMessageIds();
     let message_id = getMessageIdByClassname(messageIds, classname);
@@ -112,7 +131,7 @@ async function post_edt(webhook_id, webhook_token, role_id, date, classname) {
         await delete_message(webhook_id, webhook_token, message_id, classname);
     }
 
-    await post_message(webhook_id, webhook_token, role_id, date, classname)
+    await post_message(webhook_id, webhook_token, role_id, channel_id, date, classname, groupNumber)
         .then(() => {
             console.log("Message posted for class " + classname);
         })

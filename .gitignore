@@ -7,6 +7,6 @@ output/oldjsonFiles/*
 output/pngFiles/*
 output/*.lock
 logs/*
-config/messageIds.json
+output/messageIds.json
 config/classes.json
 config/apiKeys.json

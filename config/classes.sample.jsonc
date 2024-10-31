@@ -4,6 +4,7 @@
         "name": "class1",
         "displayname": "Classe 1",
         "roleid": "discord role id 1",
+        "channelid": "discord channel id 1",
         "webhookid": "discord webhook id 1",
         "webhooktoken": "discord webhook token 1",
         "user":{
@@ -16,6 +17,7 @@
         "name": "class2",
         "displayname": "Classe 2",
         "roleid": "discord role id 2",
+        "channelid": "discord channel id 2",
         "webhookid": "discord webhook id 2",
         "webhooktoken": "discord webhook token 2",
         "user":{
@@ -28,6 +30,7 @@
         "name": "class3",
         "displayname": "Classe 3",
         "roleid": "discord role id 3",
+        "channelid": "discord channel id 3",
         "webhookid": "discord webhook id 3",
         "webhooktoken": "discord webhook token 3",
         "user":{

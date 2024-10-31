@@ -48,7 +48,7 @@ async function postEDTForClass(class_name) {
                 await htmlLib.GenerateHTML(class_name.name, $date_str_2, cours_of_the_week)
                     .then(async () => {
                         console.log("HTML generated for " + class_name.name);
-                        await discordLib.post_edt(class_name.webhookid, class_name.webhooktoken, class_name.roleid, $date_str, class_name.name);
+                        await discordLib.post_edt(class_name.webhookid, class_name.webhooktoken, class_name.roleid, class_name.channelid, $date_str, class_name.name, class_name.user.groupNumber);
                     });
             } else {
                 console.log("No course for this week for class " + class_name.name);
