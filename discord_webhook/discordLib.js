@@ -91,7 +91,9 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
 
     // Ajoutez les liens vers les canaux Discord si groupNumber est 0
     if (groupNumber === "0") {
+        console.log("classes", classes);
         classes.forEach(cls => {
+            console.log(cls);
             if (cls.user.groupNumber !== "0") {
                 $embed.fields.push(
                     {
@@ -105,21 +107,22 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
     }
 
     $embeds.push($embed);
+    console.log("embeds", $embeds);
     // $content = "<@&" + role_id + ">";
     $content = "";
-    hook.send($content, $embeds)
-        .then((response) => {
-            //if the message is sent
-            if (response.id != undefined) {
-                let messageIds = readMessageIds();
-                setMessageIdByClassname(messageIds, classname, response.id);
-                console.log("Message ID saved for class " + classname);
-            }
-        })
-        .catch((err) => {
-            console.log("Erreur lors de l'envoi du message pour la classe " + classname);
-            console.error(err);
-        });
+    // hook.send($content, $embeds)
+    //     .then((response) => {
+    //         //if the message is sent
+    //         if (response.id != undefined) {
+    //             let messageIds = readMessageIds();
+    //             setMessageIdByClassname(messageIds, classname, response.id);
+    //             console.log("Message ID saved for class " + classname);
+    //         }
+    //     })
+    //     .catch((err) => {
+    //         console.log("Erreur lors de l'envoi du message pour la classe " + classname);
+    //         console.error(err);
+    //     });
 }
 
 async function post_edt(webhook_id, webhook_token, role_id, date, classname, groupNumber) {
