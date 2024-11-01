@@ -90,7 +90,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
     };
 
     // Ajoutez les liens vers les canaux Discord si groupNumber est 0
-    if (groupNumber === 0) {
+    if (groupNumber === "0") {
         classes.forEach(cls => {
             if (cls.user.groupNumber !== 0) {
                 $embed.fields.push(
