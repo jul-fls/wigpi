@@ -170,11 +170,11 @@ async function refreshEDT() {
     // Main function to trigger refresh
     // Copy the old json files to a backup folder for comparison
     // create a temp lock file to prevent multiple refreshes at the same time
-    fs.writeFileSync(process.env.ROOT_PATH + "output/refresh.lock", "1");
+    fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/refresh.lock", "1");
     fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldjsonFiles", {recursive: true});
     await getCoursForAllClasses().then(() => {
         compare.compareClasses($classes, process.env.ROOT_PATH);
-        fs.writeFileSync(process.env.ROOT_PATH + "output/refresh.lock", "0");
+        fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/refresh.lock", "0");
     });
 }
 

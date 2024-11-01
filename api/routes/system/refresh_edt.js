@@ -39,7 +39,7 @@ router.get('/', (req, res) => {
     }
 
     // Check if the refresh is already in progress by reading the lock file
-    const lockFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'output/refresh.lock');
+    const lockFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'output/lockFiles/refresh.lock');
     if (fs.existsSync(lockFilePath)) {
         const lockState = fs.readFileSync(lockFilePath, 'utf8').trim();
         if (lockState === '1') {

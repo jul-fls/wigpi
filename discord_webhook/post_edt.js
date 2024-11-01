@@ -58,7 +58,7 @@ async function postEDTForClass(class_name) {
 }
 
 async function postEDTForAllClasses() {
-    fs.writeFileSync(process.env.ROOT_PATH + "output/post_edt.lock", "1");
+    fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/post_edt.lock", "1");
     for (let i = 0; i < $classes.length; i++) {
         const $date = new Date();
         const $date_str = ('0' + $date.getDate()).slice(-2) + "/" + ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + $date.getFullYear() + " " + ('0' + $date.getHours()).slice(-2) + ":" + ('0' + $date.getMinutes()).slice(-2) + ":" + ('0' + $date.getSeconds()).slice(-2);
@@ -66,7 +66,7 @@ async function postEDTForAllClasses() {
         await postEDTForClass($classes[i]);
         console.log("[LOG POST EDT][" + $date_str + "] Fin de la classe " + $classes[i].name);
     }
-    fs.writeFileSync(process.env.ROOT_PATH + "output/post_edt.lock", "0");
+    fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/post_edt.lock", "0");
 }
 
 // Export the main function to be used in the API

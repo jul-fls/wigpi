@@ -5,7 +5,7 @@ output/icsFiles/*
 output/jsonFiles/*
 output/oldjsonFiles/*
 output/pngFiles/*
-output/*.lock
+output/lockFiles/*
 logs/*
 output/messageIds.json
 config/classes.json
