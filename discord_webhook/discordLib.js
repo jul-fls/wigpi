@@ -122,7 +122,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
         });
 }
 
-async function post_edt(webhook_id, webhook_token, role_id, channel_id, date, classname, groupNumber) {
+async function post_edt(webhook_id, webhook_token, role_id, date, classname, groupNumber) {
     console.log("Posting message for class " + classname);
     let messageIds = readMessageIds();
     let message_id = getMessageIdByClassname(messageIds, classname);
@@ -131,7 +131,7 @@ async function post_edt(webhook_id, webhook_token, role_id, channel_id, date, cl
         await delete_message(webhook_id, webhook_token, message_id, classname);
     }
 
-    await post_message(webhook_id, webhook_token, role_id, channel_id, date, classname, groupNumber)
+    await post_message(webhook_id, webhook_token, role_id, date, classname, groupNumber)
         .then(() => {
             console.log("Message posted for class " + classname);
         })
