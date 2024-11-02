@@ -5,8 +5,18 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const app = express();
-const port = parseInt(process.env.PORT) || 3000;
+const port = process.env.PORT || 3000;
+const env = process.env.ENV || 'dev';
 let root_path = process.env.root_path || process.cwd();
+
+// Set the correct host based on the environment
+if (env === 'dev') {
+    swaggerDocument.host = `localhost:${port}`;
+    swaggerDocument.schemes = ['http'];
+} else if (env === 'prod') {
+    swaggerDocument.host = process.env.EXTERNAL_DOMAIN.split('://')[1];
+    swaggerDocument.schemes = [process.env.EXTERNAL_DOMAIN.split('://')[0]];
+}
 
 //// DOCS ROUTE ////
 app.use('/api/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -53,5 +63,5 @@ app.use('/api/front/courses_data/public', express.static(path.join(__dirname, 'r
 
 // APP LISTEN //
 app.listen(port, () => {
-    console.log(`Wigpi api is listening at ${process.env.EXTERNAL_DOMAIN}/api`);
+    console.log(`Wigpi api is listening at ${swaggerDocument.schemes[0]}://${swaggerDocument.host}${swaggerDocument.basePath}`);
 })

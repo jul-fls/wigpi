@@ -226,10 +226,10 @@
             {
               "name": "apiKey",
               "in": "query",
-              "required": true,
+              "required": false,
               "type": "string",
               "format": "string",
-              "description": "API key to authenticate the request"
+              "description": "API key to authenticate the request (optional in swagger web ui because it's injected with the authorize button at the top of the page)"
             }
           ],
           "responses": {
@@ -301,9 +301,9 @@
             {
               "name": "apiKey",
               "in": "query",
-              "required": true,
+              "required": false,
               "type": "string",
-              "description": "API key required to authorize the request"
+              "description": "API key to authenticate the request (optional in swagger web ui because it's injected with the authorize button at the top of the page)"
             }
           ],
           "responses": {
@@ -375,9 +375,9 @@
               {
                   "name": "apiKey",
                   "in": "query",
-                  "required": true,
+                  "required": false,
                   "type": "string",
-                  "description": "API key required to authorize the request"
+                  "description": "API key to authenticate the request (optional in swagger web ui because it's injected with the authorize button at the top of the page)"
               }
           ],
           "responses": {
