@@ -21,13 +21,11 @@ async function sendDiscordMessage(content) {
 
 function isFutureCourse(course) {
     const now = new Date();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(now.getMonth() - 1);
 
     const courseStartDate = parseCourseDate(course.dtstart);
 
-    // Check if the course is in the future or within the last month
-    return courseStartDate >= oneMonthAgo;
+    // Check if the course is in the future (start date is after or equal to now)
+    return courseStartDate >= now;
 }
 
 // Convert JSON data into an object keyed by `uid`, filtering only future courses
