@@ -24,6 +24,7 @@ const dataRouteCoursesDataAPI = require('./routes/data/api/courses_data_api');
 const teachersRouteCheckIfEmailExists = require('./routes/teachers/check_if_email_exists');
 const systemRouteRefreshEdt = require('./routes/system/refresh_edt');
 const systemRoutePostDiscordEdt = require('./routes/system/post_discord_edt');
+const systemRouteCheckLocks = require('./routes/system/check_locks');
 
 app.use('/api/classes/get_json', classesRouteGetJson);
 app.use('/api/courses/get_ics', coursesRouteGetIcs);
@@ -34,6 +35,7 @@ app.use('/api/data/courses_data', dataRouteCoursesDataAPI);
 app.use('/api/teachers/check_if_email_exists', teachersRouteCheckIfEmailExists);
 app.use('/api/system/refresh_edt', systemRouteRefreshEdt);
 app.use('/api/system/post_discord_edt', systemRoutePostDiscordEdt);
+app.use('/api/system/check_locks', systemRouteCheckLocks);
 //// API ROUTES ////
 
 

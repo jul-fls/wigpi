@@ -15,6 +15,14 @@
     "produces": [
       "application/json"
     ],
+    "securityDefinitions": {
+      "api_key": {
+          "type": "apiKey",
+          "name": "apiKey",
+          "in": "query",
+          "description": "API key required to authorize the system requests"
+      }
+    },
     "paths": {
       "/classes/get_json": {
         "get": {
@@ -276,6 +284,11 @@
           },
           "tags": [
             "System"
+          ],
+          "security": [
+            {
+              "api_key": []
+            }
           ]
         }
       },
@@ -345,206 +358,280 @@
           },
           "tags": [
             "System"
+          ],
+          "security": [
+            {
+              "api_key": []
+            }
           ]
         }
-      }
+      },
+      "/system/check_locks": {
+        "get": {
+          "summary": "Check and Unlock Expired Lock Files",
+          "description": "Checks for any lock files in the active state ('1') for more than 30 minutes, logs the action, and unlocks them if found. Requires a valid API key.",
+          "operationId": "CheckLocks",
+          "parameters": [
+              {
+                  "name": "apiKey",
+                  "in": "query",
+                  "required": true,
+                  "type": "string",
+                  "description": "API key required to authorize the request"
+              }
+          ],
+          "responses": {
+              "200": {
+                  "description": "Lock files checked successfully",
+                  "schema": {
+                      "type": "object",
+                      "properties": {
+                          "message": {
+                              "type": "string",
+                              "example": "Locks checked successfully"
+                          },
+                          "unlockedLocks": {
+                              "type": "array",
+                              "items": {
+                                  "type": "string"
+                              },
+                              "example": ["file1.lock", "file2.lock"]
+                          }
+                      }
+                  }
+              },
+              "403": {
+                  "description": "Invalid or inactive API key",
+                  "schema": {
+                      "type": "object",
+                      "properties": {
+                          "error": {
+                              "type": "string",
+                              "example": "Invalid or inactive API key"
+                          }
+                      }
+                  }
+              },
+              "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                      "type": "object",
+                      "properties": {
+                          "error": {
+                              "type": "string",
+                              "example": "Error reading lock files directory"
+                          }
+                      }
+                  }
+              }
+          },
+          "tags": [
+              "System"
+          ],
+          "security": [
+            {
+              "api_key": []
+            }
+          ]
+        }
+    }
+  },
+  "definitions": {
+    "JsonClass": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "displayname": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "description": "Represents a class"
     },
-    "definitions": {
-      "JsonClass": {
-        "type": "object",
-        "properties": {
+    "JsonListClassesRequest": {
+      "type": "object",
+      "properties": {
+        "classes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JsonClass"
+          }
+        }
+      },
+      "description": "Represents a list of classes"
+    },
+    "GetCoursesDataForClassRequest": {
+      "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetCoursesDataForClassObject"
+          }
+    },
+    "GetCoursesDataForClassObject": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "format": "string"
+        },
+        "firstDate": {
+          "type": "string",
+          "format": "string"
+        },
+        "lastDate": {
+          "type": "string",
+          "format": "string"
+        },
+        "sessions":{
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "realized": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "planned": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "hours": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "realized": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "planned": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "percentageOfCompletion": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "ongoing": {
+          "type": "boolean"
+        },
+        "hasVisio": {
+          "type": "boolean"
+        },
+        "percentageOfVisio": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "teachers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Teacher"
+          }
+        }
+      },
+      "description": "Represents a list of classes"
+    },
+    "JsonCheckIfEmailExistsRequest": {
+      "type": "object",
+      "properties": {
+        "exists": {
+          "type": "boolean"
+        }
+      },
+      "description": "Represents a check if email exists"
+    },
+    "JsonListCoursesForClass": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "$ref": "#/definitions/JsonCoursesFileInfo"
+        }
+      },
+      "description": "Represents a list of courses for a class"
+    },
+    "JsonCoursesFileInfo": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "unix_timestamp"
+        },
+        "classname: ": {
+          "type": "string",
+          "format": "string"
+        },
+        "description": {
+          "type": "string",
+          "format": "string"
+        },
+        "courses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JsonCourseInfo"
+          }
+        }
+      },
+      "description": "Represents a list of courses"
+    },
+    "Teacher": {
+      "type": "object",
+      "properties": {
           "name": {
-            "type": "string",
-            "format": "string"
+              "type": "string",
+              "format": "string"
           },
-          "displayname": {
-            "type": "string",
-            "format": "string"
+          "email": {
+              "type": "string",
+              "format": "string"
           }
-        },
-        "description": "Represents a class"
       },
-      "JsonListClassesRequest": {
-        "type": "object",
-        "properties": {
-          "classes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/JsonClass"
-            }
+      "description": "Represents a teacher"
+    },
+    "JsonCourseInfo": {
+      "type": "object",
+      "properties": {
+        "dtstart": {
+          "type": "string",
+          "format": "string"
+        },
+          "dtend": {
+              "type": "string",
+              "format": "string"
+          },
+          "matiere": {
+              "type": "string",
+              "format": "string"
+          },
+          "prof": {
+            "$ref": "#/definitions/Teacher"
+          },
+          "salle": {
+              "type": "string",
+              "format": "string"
+          },
+          "batiment": {
+              "type": "string",
+              "format": "string"
+          },
+          "visio": {
+              "type": "boolean"
+          },
+          "teamslink": {
+              "type": "string",
+              "format": "string"
           }
-        },
-        "description": "Represents a list of classes"
       },
-      "GetCoursesDataForClassRequest": {
-        "type": "array",
-            "items": {
-              "$ref": "#/definitions/GetCoursesDataForClassObject"
-            }
-      },
-      "GetCoursesDataForClassObject": {
-        "type": "object",
-        "properties": {
-          "subject": {
-            "type": "string",
-            "format": "string"
-          },
-          "firstDate": {
-            "type": "string",
-            "format": "string"
-          },
-          "lastDate": {
-            "type": "string",
-            "format": "string"
-          },
-          "sessions":{
-            "type": "object",
-            "properties": {
-              "total": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "realized": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "planned": {
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          },
-          "hours": {
-            "type": "object",
-            "properties": {
-              "total": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "realized": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "planned": {
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          },
-          "percentageOfCompletion": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "ongoing": {
-            "type": "boolean"
-          },
-          "hasVisio": {
-            "type": "boolean"
-          },
-          "percentageOfVisio": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "teachers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Teacher"
-            }
-          }
-        },
-        "description": "Represents a list of classes"
-      },
-      "JsonCheckIfEmailExistsRequest": {
-        "type": "object",
-        "properties": {
-          "exists": {
-            "type": "boolean"
-          }
-        },
-        "description": "Represents a check if email exists"
-      },
-      "JsonListCoursesForClass": {
-        "type": "object",
-        "properties": {
-          "info": {
-            "$ref": "#/definitions/JsonCoursesFileInfo"
-          }
-        },
-        "description": "Represents a list of courses for a class"
-      },
-      "JsonCoursesFileInfo": {
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "type": "string",
-            "format": "unix_timestamp"
-          },
-          "classname: ": {
-            "type": "string",
-            "format": "string"
-          },
-          "description": {
-            "type": "string",
-            "format": "string"
-          },
-          "courses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/JsonCourseInfo"
-            }
-          }
-        },
-        "description": "Represents a list of courses"
-      },
-      "Teacher": {
-        "type": "object",
-        "properties": {
-            "name": {
-                "type": "string",
-                "format": "string"
-            },
-            "email": {
-                "type": "string",
-                "format": "string"
-            }
-        },
-        "description": "Represents a teacher"
-      },
-      "JsonCourseInfo": {
-        "type": "object",
-        "properties": {
-          "dtstart": {
-            "type": "string",
-            "format": "string"
-          },
-            "dtend": {
-                "type": "string",
-                "format": "string"
-            },
-            "matiere": {
-                "type": "string",
-                "format": "string"
-            },
-            "prof": {
-              "$ref": "#/definitions/Teacher"
-            },
-            "salle": {
-                "type": "string",
-                "format": "string"
-            },
-            "batiment": {
-                "type": "string",
-                "format": "string"
-            },
-            "visio": {
-                "type": "boolean"
-            },
-            "teamslink": {
-                "type": "string",
-                "format": "string"
-            }
-        },
-        "description": "Represents a course"
-      }
+      "description": "Represents a course"
     }
   }
+}
