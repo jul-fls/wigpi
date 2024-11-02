@@ -121,7 +121,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
         const hasRecentMessages = checkRecentMessages(messageIds);
         if (hasRecentMessages) {
             embed.fields.push({
-                "name": "⚠️ **Attention**",
+                "name": "⚠️ **Attention** ⚠️",
                 "value": "**Des cours de groupes transverses ont été postés récemment.**\n\n" +
                     "Veuillez vérifier les canaux des groupes transverses ci-dessus pour plus d'informations.",
                 "inline": false
