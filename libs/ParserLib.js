@@ -197,9 +197,9 @@ async function parseHTMLForWeek(response, date, groupNumber) {
                 }
             }
         }
-        //remove all the cours that have are visio and between 18:00 and 20:00
+        // Remove all the courses that start at 18:00 or later
         $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
-            return !cours.visio || (cours.visio && (parseInt(cours.heure_debut.split(":")[0]) < 18 || parseInt(cours.heure_debut.split(":")[0]) >= 20));
+            return parseInt(cours.heure_debut.split(":")[0]) < 18;
         });
 
         generateUniqueIdForWeek($cleaned_cours_week);
