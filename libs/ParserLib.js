@@ -202,6 +202,11 @@ async function parseHTMLForWeek(response, date, groupNumber) {
             return parseInt(cours.heure_debut.split(":")[0]) < 18;
         });
 
+        // Ignorer les cours sans bâtiment défini
+        $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
+            return cours.batiment !== undefined;
+        });
+
         generateUniqueIdForWeek($cleaned_cours_week);
 
         return $cleaned_cours_week;
