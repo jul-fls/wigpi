@@ -38,7 +38,7 @@ async function postEDTForClass(class_name) {
                        targetMonday.getFullYear();
     console.log(`Target Monday: ${date_str_2}`);
 
-    const base_url = process.env.WIGOR_BASE_URL;
+    const base_url = process.env.EDT_BASE_URL;
 
     const cookies = await miscLib.getCookiesForUser(class_name.user);
     if (cookies !== null) {

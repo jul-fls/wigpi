@@ -18,7 +18,7 @@ async function getCalendarForYear(year, user) {
     await sleep(interval)
         .then(async () => {
             for (const week of weeks) {
-                const base_url = process.env.WIGOR_BASE_URL;
+                const base_url = process.env.EDT_BASE_URL;
                 await getCalendarForWeek(base_url, user, week)
                     .then((cours_of_the_week) => {
                         cours_of_the_year.push(cours_of_the_week);
