@@ -7,8 +7,6 @@ const difflib = require('difflib');
 const paths = require('../../../../config/paths');
 
 require('dotenv').config();
-const path = require('path');
-const difflib = require('difflib');
 
 function getSessionStatus(startDateTime, endDateTime, now) {
     if (now < startDateTime) {
