@@ -187,7 +187,7 @@ async function refreshEDT() {
         {recursive: true}
     );
     await getCoursForAllClasses().then(() => {
-        compare.compareClasses($classes, paths.root);
+        compare.compareClasses($classes);
         fs.writeFileSync(path.join(paths.output.lock, 'refresh.lock'), "0");
     });
 }

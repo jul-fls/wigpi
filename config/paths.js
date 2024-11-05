@@ -9,6 +9,7 @@ module.exports = {
   output: {
     ics: path.join(rootDir, 'output', 'icsFiles'),
     json: path.join(rootDir, 'output', 'jsonFiles'),
+    oldJson: path.join(rootDir, 'output', 'oldjsonFiles'),
     png: path.join(rootDir, 'output', 'pngFiles'),
     lock: path.join(rootDir, 'output', 'lockFiles'),
     html: path.join(rootDir, 'output', 'htmlFiles')
