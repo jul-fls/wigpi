@@ -7,7 +7,7 @@ const compare = require('./libs/compareLib.js');
 const paths = require('./config/paths');
 const fs = require('fs');
 const crypto = require('crypto');
-const { path } = require('express/lib/application.js');
+const path = require('path');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
 $json = fs.readFileSync(path.join(paths.config, 'classes.json'));
