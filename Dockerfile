@@ -18,6 +18,7 @@ COPY discord_webhook/ ./discord_webhook/
 COPY libs/ ./libs/
 COPY template.html ./
 COPY main.js ./
+COPY testcompare.js ./
 
 # Create necessary output directories
 RUN mkdir -p output/icsFiles output/jsonFiles output/pngFiles output/lockFiles output/htmlFiles logs
