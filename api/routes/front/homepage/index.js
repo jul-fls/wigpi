@@ -1,26 +1,21 @@
 const express = require('express');
 const router = express.Router();
-
-require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const root_path = process.env.root_path || process.cwd();
+const paths = require('../../../../config/paths');
 
 router.get('/', (req, res) => {
-    $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
-    $classes = JSON.parse($classes);
-    $html = fs.readFileSync(root_path + "/api/routes/front/homepage/index.html", 'utf8');
-    $data = [];
-    for(let i = 0; i < $classes.length; i++){
-        $data.push({
-            "name": $classes[i].name,
-            "displayname": $classes[i].displayname
-        });
-    }
-    $html = $html.replace("{{classes}}", JSON.stringify($data));
-    res.type('text/html');
-    res.send($html);
-})
+    const classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
+    const html = fs.readFileSync(path.join(paths.api.routes, 'front', 'homepage', 'index.html'), 'utf8');
+    
+    const data = classes.map(classItem => ({
+        name: classItem.name,
+        displayname: classItem.displayname
+    }));
 
+    const processedHtml = html.replace("{{classes}}", JSON.stringify(data));
+    res.type('text/html');
+    res.send(processedHtml);
+});
 
 module.exports = router;

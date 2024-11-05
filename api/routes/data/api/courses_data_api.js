@@ -1,12 +1,15 @@
 const { DateTime } = require('luxon');
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+const difflib = require('difflib');
+const paths = require('../../../../config/paths');
 
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const difflib = require('difflib');
-const root_path = process.env.root_path || process.cwd();
 
 function getSessionStatus(startDateTime, endDateTime, now) {
     if (now < startDateTime) {
@@ -67,9 +70,8 @@ function filterAndRenameCourses(courses) {
 
 router.get('/:class_name', async (req, res) => {
     const class_name = req.params.class_name;
-    $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
-    $classes = JSON.parse($classes);
-    $status = 0;
+    const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
+    let $status = 0;
 
     for (let i = 0; i < $classes.length; i++) {
         if ($status != 0) {
@@ -77,7 +79,7 @@ router.get('/:class_name', async (req, res) => {
         } else {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                const classFilePath = root_path + "/output/jsonFiles/" + class_name + ".json";
+                const classFilePath = path.join(paths.output.json, `${class_name}.json`);
                 if (fs.existsSync(classFilePath)) {
                     const classData = JSON.parse(fs.readFileSync(classFilePath, 'utf8'));
 

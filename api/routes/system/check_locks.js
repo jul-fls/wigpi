@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-
-require('dotenv').config();
+const paths = require('../../../config/paths');
 
 // Load API keys
-const apiKeysFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'config/apiKeys.json');
+const apiKeysFilePath = path.join(paths.config, 'apiKeys.json');
 const apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
 
 // Function to redirect logs to a specific file
@@ -35,9 +34,9 @@ router.get('/', (req, res) => {
         return res.status(403).json({ error: 'Invalid or inactive API key' });
     }
 
-    const lockDirPath = path.join(process.env.ROOT_PATH || process.cwd(), 'output/lockFiles');
+    const lockDirPath = paths.output.lock;
     const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
-    const logFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'logs/lock_check.log');
+    const logFilePath = path.join(paths.logs, 'lock_check.log');
     const restoreConsole = redirectLogsToFile(logFilePath);
     const expiredLocks = [];
 

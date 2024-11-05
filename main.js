@@ -4,11 +4,13 @@ const ics = require('./libs/icsLib.js');
 const json = require('./libs/jsonLib.js');
 const misc = require('./libs/miscLib.js');
 const compare = require('./libs/compareLib.js');
+const paths = require('../../../config/paths');
 const fs = require('fs');
 const crypto = require('crypto');
+const { path } = require('express/lib/application.js');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
-$json = fs.readFileSync(process.env.ROOT_PATH + "config/classes.json");
+$json = fs.readFileSync(path.join(paths.config, 'classes.json'));
 $classes = JSON.parse($json);
 async function getCoursForYear(year, user) {
     await cal.getCalendarForYear(year, user)
@@ -25,8 +27,8 @@ async function getCoursForYear(year, user) {
 }
 
 async function getCoursForClass(user, classname, displayname) {
-    icsFileName = process.env.ROOT_PATH + "output/icsFiles/" + classname + ".ics.tmp";
-    jsonFileName = process.env.ROOT_PATH + "output/jsonFiles/" + classname + ".json.tmp";
+    icsFileName = path.join(paths.output.ics, `${classname}.ics.tmp`);
+    jsonFileName = path.join(paths.output.json, `${classname}.json.tmp`);
     const now = new Date();
     // if now is after or the 1st of september and before the 1st of january, the actual year is the current year, and if now is after or the 1st of january and before the 1st of september, the actual year is the current year - 1
     if (now.getMonth() >= 8) {
@@ -65,22 +67,30 @@ async function getCoursForClass(user, classname, displayname) {
         });
 
     // Ensure temp files are properly renamed
-    const $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
-    const $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
+    const $icsFiles = fs.readdirSync(paths.output.ics);
+    const $jsonFiles = fs.readdirSync(paths.output.json);
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i], process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i].replace(".tmp", ""), (err) => {
-                if (err) throw err;
-                console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
-            });
+            await fs.rename(
+                path.join(paths.output.ics, $icsFiles[i]),
+                path.join(paths.output.ics, $icsFiles[i].replace(".tmp", "")),
+                (err) => {
+                    if (err) throw err;
+                    console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
+                }
+            );
         }
     }
     for (let i = 0; i < $jsonFiles.length; i++) {
         if ($jsonFiles[i].includes(".tmp")) {
-            await fs.rename(process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i], process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i].replace(".tmp", ""), (err) => {
-                if (err) throw err;
-                console.log("Done writing json file for class " + $jsonFiles[i].replace(".tmp", ""));
-            });
+            await fs.rename(
+                path.join(paths.output.json, $jsonFiles[i]),
+                path.join(paths.output.json, $jsonFiles[i].replace(".tmp", "")),
+                (err) => {
+                    if (err) throw err;
+                    console.log("Done writing json file for class " + $jsonFiles[i].replace(".tmp", ""));
+                }
+            );
         }
     }
 }
@@ -105,14 +115,14 @@ async function getCoursForAllClasses() {
     await new Promise(r => setTimeout(r, 10000));
 
     // move the tmp files to the final ones
-    const $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
-    const $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
+    const $icsFiles = fs.readdirSync(paths.output.ics);
+    const $jsonFiles = fs.readdirSync(paths.output.json);
 
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
             await fs.promises.rename(
-                process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i], 
-                process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i].replace(".tmp", "")
+                path.join(paths.output.ics, $icsFiles[i]),
+                path.join(paths.output.ics, $icsFiles[i].replace(".tmp", ""))
             );
             console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
         }
@@ -122,8 +132,8 @@ async function getCoursForAllClasses() {
         if ($jsonFiles[i].includes(".tmp")) {
             const newFileName = $jsonFiles[i].replace(".tmp", "");
             await fs.promises.rename(
-                process.env.ROOT_PATH + "output/jsonFiles/" + $jsonFiles[i], 
-                process.env.ROOT_PATH + "output/jsonFiles/" + newFileName
+                path.join(paths.output.json, $jsonFiles[i]),
+                path.join(paths.output.json, newFileName)
             );
             console.log("Done writing json file for class " + newFileName);
         }
@@ -170,11 +180,15 @@ async function refreshEDT() {
     // Main function to trigger refresh
     // Copy the old json files to a backup folder for comparison
     // create a temp lock file to prevent multiple refreshes at the same time
-    fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/refresh.lock", "1");
-    fs.cpSync(process.env.ROOT_PATH + "output/jsonFiles", process.env.ROOT_PATH + "output/oldjsonFiles", {recursive: true});
+    fs.writeFileSync(path.join(paths.output.lock, 'refresh.lock'), "1");
+    fs.cpSync(
+        paths.output.json,
+        path.join(paths.root, 'output', 'oldjsonFiles'),
+        {recursive: true}
+    );
     await getCoursForAllClasses().then(() => {
-        compare.compareClasses($classes, process.env.ROOT_PATH);
-        fs.writeFileSync(process.env.ROOT_PATH + "output/lockFiles/refresh.lock", "0");
+        compare.compareClasses($classes, paths.root);
+        fs.writeFileSync(path.join(paths.output.lock, 'refresh.lock'), "0");
     });
 }
 
