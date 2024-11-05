@@ -4,6 +4,15 @@ const path = require('path');
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
+
+// Vérification de l'existence du fichier paths.js
+const pathsFile = path.join(__dirname, '../config/paths.js');
+if (!fs.existsSync(pathsFile)) {
+    console.error(`Le fichier ${pathsFile} n'existe pas`);
+    console.error('Contenu du répertoire config:', fs.readdirSync(path.join(__dirname, '../config')));
+    process.exit(1);
+}
+
 const paths = require('../config/paths');
 const app = express();
 const port = process.env.PORT || 3000;
