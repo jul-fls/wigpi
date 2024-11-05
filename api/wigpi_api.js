@@ -7,7 +7,7 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 const env = process.env.ENV || 'dev';
-let root_path = process.env.root_path || process.cwd();
+const root_path = process.env.root_path || process.cwd();
 
 // Set the correct host based on the environment
 if (env === 'dev') {

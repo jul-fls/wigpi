@@ -12,7 +12,7 @@ function getNextMondayOrPreviousMonday() {
     const today = new Date();
     const dayOfWeek = today.getDay(); // Sunday is 0, Monday is 1, ..., Saturday is 6
 
-    let targetMonday = new Date(today);
+    const targetMonday = new Date(today);
 
     if (dayOfWeek === 0 || dayOfWeek >= 5) {
         // If it's Sunday (0), Friday (5), or Saturday (6), get the next Monday

@@ -91,9 +91,9 @@ async function parseHTMLForWeek(response, date, groupNumber) {
             
             // Process the room information
             if (cours.salle) {
-                let salleParts = cours.salle.split("(");
+                const salleParts = cours.salle.split("(");
                 if (salleParts.length > 1) {
-                    let batimentParts = salleParts[1].split(")");
+                    const batimentParts = salleParts[1].split(")");
                     if (batimentParts.length > 0) {
                         cours.batiment = batimentParts[0];
                         if (cours.batiment === "DISTANCIEL") {

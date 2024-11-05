@@ -134,7 +134,7 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
     hook.send(content, embeds)
         .then((response) => {
             if (response.id != undefined) {
-                let messageIds = readMessageIds();
+                const messageIds = readMessageIds();
                 setMessageIdByClassname(messageIds, classname, response.id);
                 console.log("Message ID saved for class " + classname);
             }
@@ -147,8 +147,8 @@ async function post_message(webhook_id, webhook_token, role_id, date, classname,
 
 async function post_edt(webhook_id, webhook_token, role_id, date, classname, groupNumber) {
     console.log("Posting message for class " + classname);
-    let messageIds = readMessageIds();
-    let message_id = getMessageIdByClassname(messageIds, classname);
+    const messageIds = readMessageIds();
+    const message_id = getMessageIdByClassname(messageIds, classname);
 
     if (message_id) {
         await delete_message(webhook_id, webhook_token, message_id, classname);

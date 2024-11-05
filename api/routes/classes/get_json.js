@@ -4,7 +4,7 @@ const router = express.Router();
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-let root_path = process.env.root_path || process.cwd();
+const root_path = process.env.root_path || process.cwd();
 
 router.get('/', (req, res) => {
     const json = fs.readFileSync(root_path + "/config/classes.json", 'utf8'); // Make sure to define root_path correctly

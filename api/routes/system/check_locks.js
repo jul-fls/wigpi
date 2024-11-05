@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Load API keys
 const apiKeysFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'config/apiKeys.json');
-let apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
+const apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
 
 // Function to redirect logs to a specific file
 function redirectLogsToFile(logFilePath) {

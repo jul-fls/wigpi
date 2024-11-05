@@ -4,20 +4,20 @@ const router = express.Router();
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-let root_path = process.env.root_path || process.cwd();
+const root_path = process.env.root_path || process.cwd();
 
 router.get('/:class_name/:timestamp', (req, res) => {
     const class_name = req.params.class_name;
     $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
     $classes = JSON.parse($classes);
     $status = 0;
-    for(var i = 0; i < $classes.length; i++){
+    for(let i = 0; i < $classes.length; i++){
         if($status == 0) {
             if($classes[i].name === class_name){
                 $status = 1;
-                let chemin = root_path + "/output/pngFiles/" + class_name + ".png";
+                const pngFilePath = root_path + "/output/pngFiles/" + class_name + ".png";
                 res.type('image/png');
-                res.sendFile(chemin);
+                res.sendFile(pngFilePath);
             }
         }else{
             break;

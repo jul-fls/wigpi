@@ -32,14 +32,14 @@ async function EpsiNameToEmail(name) {
     name = normalizeString(name);
     name = name.toLowerCase()
 
-    let emailParts = name.split(" ");
-    let firstName = emailParts.pop(); // Always the last part
-    let lastNameParts = emailParts.map(part => part.replace(/-/g, "").toLowerCase());
-    let lastName = lastNameParts.join('');
+    const emailParts = name.split(" ");
+    const firstName = emailParts.pop(); // Always the last part
+    const lastNameParts = emailParts.map(part => part.replace(/-/g, "").toLowerCase());
+    const lastName = lastNameParts.join('');
     let mailDomain = "@mail-formateur.net"; // Default domain
 
     // Dynamically determine if the profName matches any predetermined email exceptions
-    let matchedException = lastNameParts.find(part => predeterminedEmails.hasOwnProperty(part));
+    const matchedException = lastNameParts.find(part => predeterminedEmails.hasOwnProperty(part));
     if (matchedException) {
         return predeterminedEmails[matchedException]; // Return the predetermined email if match found
     }

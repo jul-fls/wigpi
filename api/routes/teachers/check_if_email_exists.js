@@ -5,7 +5,6 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const miscLib = require('../../../libs/miscLib');
-let root_path = process.env.root_path || process.cwd();
 
 router.get('/:email', async (req, res) => {
     const email = req.params.email;

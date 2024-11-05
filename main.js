@@ -65,8 +65,8 @@ async function getCoursForClass(user, classname, displayname) {
         });
 
     // Ensure temp files are properly renamed
-    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
-    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
+    const $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
+    const $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
             await fs.rename(process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i], process.env.ROOT_PATH + "output/icsFiles/" + $icsFiles[i].replace(".tmp", ""), (err) => {
@@ -105,8 +105,8 @@ async function getCoursForAllClasses() {
     await new Promise(r => setTimeout(r, 10000));
 
     // move the tmp files to the final ones
-    let $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
-    let $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
+    const $icsFiles = fs.readdirSync(process.env.ROOT_PATH + "output/icsFiles/");
+    const $jsonFiles = fs.readdirSync(process.env.ROOT_PATH + "output/jsonFiles/");
 
     for (let i = 0; i < $icsFiles.length; i++) {
         if ($icsFiles[i].includes(".tmp")) {
@@ -136,10 +136,10 @@ async function getCoursForAllClasses() {
 function createFakeCoursMaintenances() {
 //    create a loop to iterate every day from the 01/01/2024 to 31/12/2024
     for (let i = 0; i < 365; i++) {
-        let date = new Date("2024-01-01");
+        const date = new Date("2024-01-01");
         date.setDate(date.getDate() + i);
         // convert the date to YYYYMMDDT000000Z format
-        let dateStr = date.toISOString().split('T')[0].replace(/-/g, '') + "T";
+        const dateStr = date.toISOString().split('T')[0].replace(/-/g, '') + "T";
         ics.write("event", {
             dtstart: dateStr + "080000",
             dtend: dateStr + "090000",

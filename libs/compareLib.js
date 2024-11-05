@@ -109,7 +109,7 @@ function detectDifferences(oldCourses, newCourses) {
         if (!oldCourses[uid]) {
             added.push(newCourses[uid]); // New course added
         } else {
-            let detailedDifferences = detectDetailedDifferences(oldCourses[uid], newCourses[uid]);
+            const detailedDifferences = detectDetailedDifferences(oldCourses[uid], newCourses[uid]);
             if (detailedDifferences.length > 0) {
                 modified.push({
                     before: oldCourses[uid],
