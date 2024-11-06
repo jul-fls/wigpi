@@ -162,13 +162,7 @@
                     }
                 },
                 "tags": [
-                    {
-                        "name": "class_name",
-                        "in": "path",
-                        "required": true,
-                        "type": "string",
-                        "format": "string"
-                    }
+                    "Courses"
                 ]
             }
         },
