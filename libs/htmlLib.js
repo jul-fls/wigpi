@@ -135,7 +135,7 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=${process.env.PNG_WIDTH}&height=${process.env.PNG_HEIGHT}&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=${process.env.PNG_WIDTH}&height=${process.env.PNG_HEIGHT}&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html_calendar/${classname}`;
     try {
         const response = await fetch(screenshotUrl);
         const buffer = await response.arrayBuffer();

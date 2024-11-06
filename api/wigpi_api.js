@@ -39,6 +39,7 @@ const coursesRouteGetIcs = require(path.join(paths.api.routes, 'courses', 'get_i
 const coursesRouteGetJson = require(path.join(paths.api.routes, 'courses', 'get_json'));
 const coursesRouteGetPng = require(path.join(paths.api.routes, 'courses', 'get_png'));
 const coursesRouteGetHtml = require(path.join(paths.api.routes, 'courses', 'get_html'));
+const coursesRouteGetHtmlCalendar = require(path.join(paths.api.routes, 'courses', 'get_html_calendar'));
 const dataRouteCoursesDataAPI = require(path.join(paths.api.routes, 'data', 'api', 'courses_data_api'));
 const teachersRouteCheckIfEmailExists = require(path.join(paths.api.routes, 'teachers', 'check_if_email_exists'));
 const systemRouteRefreshEdt = require(path.join(paths.api.routes, 'system', 'refresh_edt'));
@@ -50,6 +51,7 @@ app.use('/api/courses/get_ics', coursesRouteGetIcs);
 app.use('/api/courses/get_json', coursesRouteGetJson);
 app.use('/api/courses/get_png', coursesRouteGetPng);
 app.use('/api/courses/get_html', coursesRouteGetHtml);
+app.use('/api/courses/get_html_calendar', coursesRouteGetHtmlCalendar);
 app.use('/api/data/courses_data', dataRouteCoursesDataAPI);
 app.use('/api/teachers/check_if_email_exists', teachersRouteCheckIfEmailExists);
 app.use('/api/system/refresh_edt', systemRouteRefreshEdt);

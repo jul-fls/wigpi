@@ -9,17 +9,49 @@ router.get('/:class_name', (req, res) => {
     const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
     let $status = 0;
 
-    for (let i = 0; i < $classes.length; i++) {
-        if ($status == 0) {
-            if ($classes[i].name === class_name) {
+    for(let i = 0; i < $classes.length; i++) {
+        if($status == 0) {
+            if($classes[i].name === class_name) {
                 $status = 1;
-                const htmlFilePath = path.join(paths.output.html, `${class_name}.html`);
-                fs.readFile(htmlFilePath, 'utf8', function(err, data) {
-                    if (err) {
+                const jsonFilePath = path.join(paths.output.json, `${class_name}.json`);
+                fs.readFile(jsonFilePath, 'utf8', function(err, data) {
+                    if(err) {
                         res.send("error");
                     } else {
-                        res.type('text/html');
-                        res.send(data);
+                        const jsonData = JSON.parse(data);
+                        let htmlContent = `
+                            <html>
+                                <head>
+                                    <title>${jsonData.info.classname}</title>
+                                </head>
+                                <body>
+                                    <h1>${jsonData.info.classname}</h1>
+                                    <p>${jsonData.info.description}</p>
+                                    <ul>
+                        `;
+
+                        jsonData.courses.forEach(course => {
+                            htmlContent += `
+                                <li>
+                                    <strong>Subject:</strong> ${course.matiere} <br>
+                                    <strong>Professor:</strong> ${course.prof.name} (${course.prof.email})<br>
+                                    <strong>Start:</strong> ${course.dtstart} <br>
+                                    <strong>End:</strong> ${course.dtend} <br>
+                                    <strong>Location:</strong> ${course.salle}, Building: ${course.batiment}<br>
+                                    <strong>Visio:</strong> ${course.visio ? 'Yes' : 'No'}<br>
+                                    ${course.visio && course.teamslink !== "null" ? `<strong>Teams Link:</strong> <a href="${course.teamslink}">${course.teamslink}</a>` : ''}
+                                </li>
+                                <hr>
+                            `;
+                        });
+
+                        htmlContent += `
+                                    </ul>
+                                </body>
+                            </html>
+                        `;
+
+                        res.send(htmlContent);
                     }
                 });
             }
@@ -28,7 +60,7 @@ router.get('/:class_name', (req, res) => {
         }
     }
 
-    if ($status == 0) {
+    if($status == 0){
         res.send("error");
     }
 
@@ -47,7 +79,8 @@ router.get('/:class_name', (req, res) => {
     
     fs.writeFile(
         path.join(paths.logs, 'api_access.log'),
-        `[LOG REQUEST HTML][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"\r\n`,
+        `[LOG REQUEST JSON][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"
+`,
         { flag: 'a+' },
         (err) => {
             if (err) throw err;
