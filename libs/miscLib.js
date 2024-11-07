@@ -26,6 +26,7 @@ async function EpsiNameToEmail(name) {
         "ladrat": "geoffroy.ladrat1@mail-formateur.net",
         "pichon": "olivier.pichon1@mail-formteur.net",
         "berthellot": "laura.berthellot1@campus-cd.com",
+        "faye": "jeanfrancois.faye@mail-formateur.net"
     };
 
     // Normalize the name to remove accents
