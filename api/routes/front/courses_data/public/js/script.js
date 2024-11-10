@@ -498,7 +498,7 @@ function addSessionsList(module, sessions) {
   // Add event listener to toggle the icon and visibility
   toggleButton.addEventListener("click", () => {
     sessionList.classList.toggle("hidden"); // Toggle visibility of sessionList, not sessionListContainer
-    let icon = toggleButton.querySelector("svg");
+    const icon = toggleButton.querySelector("svg");
     if (sessionList.classList.contains("hidden")) {
       icon.classList.remove("fa-chevron-up");
       icon.classList.add("fa-chevron-down");

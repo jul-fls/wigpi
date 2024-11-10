@@ -5,29 +5,31 @@ LABEL org.opencontainers.image.description "The main image for the backend of th
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
+# Copy package files first (for better caching)
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
-COPY . .
+# Copy specific directories and files
+COPY api/ ./api/
+COPY config/ ./config/
+COPY discord_webhook/ ./discord_webhook/
+COPY libs/ ./libs/
+COPY template.html ./
+COPY main.js ./
+COPY testcompare.js ./
 
-# Stage 2: Runtime
-FROM node:20-alpine AS runtime
-
-# Set the working directory
-WORKDIR /app
+# Create necessary output directories
+RUN mkdir -p output/icsFiles output/jsonFiles output/pngFiles output/lockFiles output/htmlFiles logs
 
 # Install tzdata for timezone management
 RUN apk add --no-cache tzdata
 
-# Copy node_modules and application code from the build stage
-COPY --from=build /app /app
-
-# Expose the port your app runs on
+# Tell Docker about the port we'll run on
 EXPOSE 3000
+
+RUN ls -R /app
 
 # Command to run the server
 CMD [ "node", "api/wigpi_api.js" ]

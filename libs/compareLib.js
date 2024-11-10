@@ -1,4 +1,7 @@
 const fs = require('fs');
+const path = require('path');
+const paths = require('../config/paths');
+
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 // Function to send a Discord message
@@ -109,7 +112,7 @@ function detectDifferences(oldCourses, newCourses) {
         if (!oldCourses[uid]) {
             added.push(newCourses[uid]); // New course added
         } else {
-            let detailedDifferences = detectDetailedDifferences(oldCourses[uid], newCourses[uid]);
+            const detailedDifferences = detectDetailedDifferences(oldCourses[uid], newCourses[uid]);
             if (detailedDifferences.length > 0) {
                 modified.push({
                     before: oldCourses[uid],
@@ -131,13 +134,13 @@ function detectDifferences(oldCourses, newCourses) {
 }
 
 // Main function to compare JSON files for all classes and send Discord messages if changes are detected
-async function compareClasses(classes, rootPath) {
+async function compareClasses(classes) {
     // Compare JSON files for each class
     for (const cl of classes) {
         // if (cl.name === "i2-eisi-dev2") {
         if (true) {
-            const oldJsonPath = rootPath + `output/oldjsonFiles/${cl.name}.json`;
-            const newJsonPath = rootPath + `output/jsonFiles/${cl.name}.json`;
+            const oldJsonPath = path.join(paths.output.oldJson, `${cl.name}.json`);
+            const newJsonPath = path.join(paths.output.json, `${cl.name}.json`);
 
             // Check if both JSON files exist
             if (fs.existsSync(oldJsonPath) && fs.existsSync(newJsonPath)) {

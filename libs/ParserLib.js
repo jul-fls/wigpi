@@ -91,9 +91,9 @@ async function parseHTMLForWeek(response, date, groupNumber) {
             
             // Process the room information
             if (cours.salle) {
-                let salleParts = cours.salle.split("(");
+                const salleParts = cours.salle.split("(");
                 if (salleParts.length > 1) {
-                    let batimentParts = salleParts[1].split(")");
+                    const batimentParts = salleParts[1].split(")");
                     if (batimentParts.length > 0) {
                         cours.batiment = batimentParts[0];
                         if (cours.batiment === "DISTANCIEL") {
@@ -200,6 +200,11 @@ async function parseHTMLForWeek(response, date, groupNumber) {
         // Remove all the courses that start at 18:00 or later
         $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
             return parseInt(cours.heure_debut.split(":")[0]) < 18;
+        });
+
+        // Ignorer les cours sans bâtiment défini
+        $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
+            return cours.batiment !== undefined;
         });
 
         generateUniqueIdForWeek($cleaned_cours_week);

@@ -2,28 +2,25 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const { refreshEDT } = require('../../../main'); // Import the refreshEDT function
-
-require('dotenv').config();
+const paths = require('../../../config/paths');
+const { refreshEDT } = require('../../../main');
 
 // Load API keys
-const apiKeysFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'config/apiKeys.json');
-let apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
+const apiKeysFilePath = path.join(paths.config, 'apiKeys.json');
+const apiKeys = JSON.parse(fs.readFileSync(apiKeysFilePath, 'utf8'));
 
 // Function to redirect logs to a specific file
 function redirectLogsToFile(logFilePath) {
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
-    // Override console.log to only write to the log file
     console.log = (...args) => {
         const message = args.join(' ') + '\n';
-        logStream.write(message); // Only write to the log file, not the console
+        logStream.write(message);
     };
 
-    // Return a cleanup function to restore original console.log
     return () => {
         console.log = (...args) => {
-            process.stdout.write(args.join(' ') + '\n'); // Restore original console.log behavior
+            process.stdout.write(args.join(' ') + '\n');
         };
         logStream.end();
     };
@@ -39,7 +36,7 @@ router.get('/', (req, res) => {
     }
 
     // Check if the refresh is already in progress by reading the lock file
-    const lockFilePath = path.join(process.env.ROOT_PATH || process.cwd(), 'output/lockFiles/refresh.lock');
+    const lockFilePath = path.join(paths.output.lock, 'refresh.lock');
     if (fs.existsSync(lockFilePath)) {
         const lockState = fs.readFileSync(lockFilePath, 'utf8').trim();
         if (lockState === '1') {
@@ -54,7 +51,7 @@ router.get('/', (req, res) => {
     const dateStr = date.toLocaleString('fr-FR', { hour12: false });
 
     const logMessage = `[LOG REQUEST REFRESH EDT][${dateStr}] Request from IP ${clientIp}, User-Agent ${userAgent} with API key: ${apiKey}\n`;
-    fs.appendFile(path.join(process.env.ROOT_PATH || process.cwd(), 'logs/api_access.log'), logMessage, (err) => {
+    fs.appendFile(path.join(paths.logs, 'api_access.log'), logMessage, (err) => {
         if (err) {
             console.error("Failed to write log:", err);
         }
@@ -66,7 +63,7 @@ router.get('/', (req, res) => {
     // Run the refresh asynchronously after sending the response
     setImmediate(async () => {
         // Redirect logs to create_ics.log
-        const restoreConsole = redirectLogsToFile(path.join(process.env.ROOT_PATH || process.cwd(), 'logs/create_ics.log'));
+        const restoreConsole = redirectLogsToFile(path.join(paths.logs, 'create_ics.log'));
 
         try {
             await refreshEDT();

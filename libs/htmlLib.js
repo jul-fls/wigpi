@@ -1,8 +1,10 @@
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const cheerio = require('cheerio');
+const paths = require('../config/paths');
 
 // Function to hash a string (like matiere) into a color
 function hashStringToColor(str) {
@@ -16,26 +18,23 @@ function hashStringToColor(str) {
     return `#${color.substring(0, 6)}`;  // Trim to 6 characters for valid hex
 }
 
-
 async function GenerateHTML(classname, date1, $cours_of_the_week) {
     const $date = new Date(date1);
-    const $cours = $cours_of_the_week.map((cours) => {
-        return {
-            'prof': cours.prof.name,
-            'matiere': cours.matiere,
-            'annee': cours.annee,
-            'batiment': cours.batiment,
-            'salle': cours.salle,
-            'horaires': cours.horaires,
-            'heure_debut': cours.heure_debut,
-            'heure_fin': cours.heure_fin,
-            'date': cours.date,
-            'jour': cours.jour,
-        };
-    });
+    const $cours = $cours_of_the_week.map((cours) => ({
+        'prof': cours.prof.name,
+        'matiere': cours.matiere,
+        'annee': cours.annee,
+        'batiment': cours.batiment,
+        'salle': cours.salle,
+        'horaires': cours.horaires,
+        'heure_debut': cours.heure_debut,
+        'heure_fin': cours.heure_fin,
+        'date': cours.date,
+        'jour': cours.jour,
+    }));
 
     // Read the template
-    const templatePath = process.env.ROOT_PATH + "template.html";
+    const templatePath = path.join(paths.root, 'template.html');
     const templateHtml = fs.readFileSync(templatePath, 'utf8');
 
     // Load the template into Cheerio
@@ -132,15 +131,15 @@ async function GenerateHTML(classname, date1, $cours_of_the_week) {
     });
 
     // Save the generated HTML
-    const outputPath = process.env.ROOT_PATH + `output/htmlFiles/${classname}.html`;
+    const outputPath = path.join(paths.output.html, `${classname}.html`);
     fs.writeFileSync(outputPath, $.html());
 
     // Make HTTP GET call to capture the screenshot
-    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=${process.env.PNG_WIDTH}&height=${process.env.PNG_HEIGHT}&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html/${classname}`;
+    const screenshotUrl = `${process.env.SCREENSHOT_SERVICE_URL}?width=${process.env.PNG_WIDTH}&height=${process.env.PNG_HEIGHT}&url=${process.env.EXTERNAL_DOMAIN}/api/courses/get_html_calendar/${classname}`;
     try {
         const response = await fetch(screenshotUrl);
         const buffer = await response.arrayBuffer();
-        fs.writeFileSync(process.env.ROOT_PATH + `output/pngFiles/${classname}.png`, Buffer.from(buffer));
+        fs.writeFileSync(path.join(paths.output.png, `${classname}.png`), Buffer.from(buffer));
     } catch (error) {
         console.error("Error taking screenshot: ", error);
     }

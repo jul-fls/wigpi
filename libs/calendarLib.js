@@ -1,12 +1,12 @@
 require('dotenv').config();
-var fs = require('fs');
-var path = require('path');
-var crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 const dt = require('./DateTimeLib.js');
 const parser = require('./ParserLib.js');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
-var interval = 1; //ms
+const interval = 1; //ms
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -18,7 +18,7 @@ async function getCalendarForYear(year, user) {
     await sleep(interval)
         .then(async () => {
             for (const week of weeks) {
-                const base_url = process.env.WIGOR_BASE_URL;
+                const base_url = process.env.EDT_BASE_URL;
                 await getCalendarForWeek(base_url, user, week)
                     .then((cours_of_the_week) => {
                         cours_of_the_year.push(cours_of_the_week);
@@ -31,7 +31,7 @@ async function getCalendarForYear(year, user) {
 
 async function getCalendarForWeek(base_url, user, date) {
     const url = base_url + "?date=" + date;
-    let requestBodyJson = {
+    const requestBodyJson = {
         cookies: user.cookies
     };
     let responseBody;

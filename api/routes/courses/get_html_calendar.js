@@ -13,12 +13,12 @@ router.get('/:class_name', (req, res) => {
         if ($status == 0) {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                const icsFilePath = path.join(paths.output.ics, `${class_name}.ics`);
-                fs.readFile(icsFilePath, 'utf8', function(err, data) {
+                const htmlFilePath = path.join(paths.output.html, `${class_name}.html`);
+                fs.readFile(htmlFilePath, 'utf8', function(err, data) {
                     if (err) {
                         res.send("error");
                     } else {
-                        res.type('text/calendar');
+                        res.type('text/html');
                         res.send(data);
                     }
                 });
@@ -43,11 +43,11 @@ router.get('/:class_name', (req, res) => {
                      ('0' + $date.getMinutes()).slice(-2) + ":" + 
                      ('0' + $date.getSeconds()).slice(-2);
 
-    console.log(`[LOG REQUEST ICS][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"`);
+    console.log(`[LOG REQUEST HTML CALENDAR][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"`);
     
     fs.writeFile(
         path.join(paths.logs, 'api_access.log'),
-        `[LOG REQUEST ICS][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"\r\n`,
+        `[LOG REQUEST HTML CALENDAR][${$date_str}] Requête entrante du client ${$user_agent} avec l'ip ${$client_ip} pour la classe "${class_name}"\r\n`,
         { flag: 'a+' },
         (err) => {
             if (err) throw err;

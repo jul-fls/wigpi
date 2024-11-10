@@ -27,21 +27,17 @@ function edit_message(webhook_id, webhook_token, message_id, date, filename){
         "avatar_url": "https://i.postimg.cc/5ySzCJb0/logo-epsi.png",
         "username": "EDT"
     }));
-    const path = require('path');
-    let chemin = process.env.ROOT_PATH+"julien.flusin_cours.png";
-    form.append('file', fs.createReadStream(chemin));
     //send the request to the discord api
     const response = fetch('https://discord.com/api/webhooks/'+webhook_id+'/'+webhook_token+'/messages/'+message_id, {
         method: 'PATCH',
         body: form
     })
     .then((res) => { 
-        status = res.status; 
+        status1 = res.status; 
         return res.json() 
       })
     .then((response) => {
-        // console.log(jsonResponse);
-        console.log(status);
+        console.log(status1);
     })
 }
 edit_message('1031336832379654144', 'wIxwtJZgOG-KtBq_Wo4IqbA_RYPUNrrXigXEn-69LtkFyIi7kF2jniogzVKPU_ZyE13p', '1031336902621663272', '07/11/2022', 'julien.flusin_cours.png');

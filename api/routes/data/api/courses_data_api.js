@@ -1,12 +1,12 @@
 const { DateTime } = require('luxon');
 const express = require('express');
 const router = express.Router();
-
-require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const difflib = require('difflib');
-let root_path = process.env.root_path || process.cwd();
+const paths = require('../../../../config/paths');
+
+require('dotenv').config();
 
 function getSessionStatus(startDateTime, endDateTime, now) {
     if (now < startDateTime) {
@@ -34,10 +34,10 @@ function filterAndRenameCourses(courses) {
             data[courseName] = true; // Mark this course name as processed
         }
 
-        let profName = decodeURIComponent(JSON.parse('"' + course.prof.name + '"'));
+        const profName = decodeURIComponent(JSON.parse('"' + course.prof.name + '"'));
 
         // Create a new course object with potentially updated course name and add it to the processed list
-        let newCourse = { ...course, matiere: courseName, prof: { name: profName, email: course.prof.email } };
+        const newCourse = { ...course, matiere: courseName, prof: { name: profName, email: course.prof.email } };
         processedCourses.push(newCourse);
     });
 
@@ -67,24 +67,23 @@ function filterAndRenameCourses(courses) {
 
 router.get('/:class_name', async (req, res) => {
     const class_name = req.params.class_name;
-    $classes = fs.readFileSync(root_path + "/config/classes.json", 'utf8');
-    $classes = JSON.parse($classes);
-    $status = 0;
+    const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
+    let $status = 0;
 
-    for (var i = 0; i < $classes.length; i++) {
+    for (let i = 0; i < $classes.length; i++) {
         if ($status != 0) {
             break;
         } else {
             if ($classes[i].name === class_name) {
                 $status = 1;
-                let classFilePath = root_path + "/output/jsonFiles/" + class_name + ".json";
+                const classFilePath = path.join(paths.output.json, `${class_name}.json`);
                 if (fs.existsSync(classFilePath)) {
-                    let classData = JSON.parse(fs.readFileSync(classFilePath, 'utf8'));
+                    const classData = JSON.parse(fs.readFileSync(classFilePath, 'utf8'));
 
                     if (classData.courses.length > 0) {
                         // Apply filtering and renaming logic to courses
-                        let dataTimestamp = classData.info.timestamp;
-                        let processedCourses = filterAndRenameCourses(classData.courses);
+                        const dataTimestamp = classData.info.timestamp;
+                        const processedCourses = filterAndRenameCourses(classData.courses);
                         
                         // Initialize stats for each batiment
                         const stats = {
@@ -303,10 +302,10 @@ function calculateDuration(startDateTime, endDateTime) {
 
 function isSimilarEnough(a, b, threshold = 0.8) {
     if(a.toLowerCase().includes("mspr") && b.toLowerCase().includes("mspr")){
-        let s = new difflib.SequenceMatcher(null, a, b);
+        const s = new difflib.SequenceMatcher(null, a, b);
         return s.ratio() >= 0.95;
     }else{
-        let s = new difflib.SequenceMatcher(null, a.toLowerCase(), b.toLowerCase());
+        const s = new difflib.SequenceMatcher(null, a.toLowerCase(), b.toLowerCase());
         return s.ratio() >= threshold;   
     }
 }

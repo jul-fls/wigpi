@@ -1,6 +1,11 @@
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const compare = require('./libs/compareLib.js');
-$json = fs.readFileSync(process.env.ROOT_PATH + "config/classes.json");
-$classes = JSON.parse($json);
-compare.compareClasses($classes, process.env.ROOT_PATH);
+const paths = require('./config/paths');
+
+// Lecture du fichier de configuration des classes
+const $json = fs.readFileSync(path.join(paths.config, 'classes.json'));
+const $classes = JSON.parse($json);
+
+compare.compareClasses($classes, paths.root);
