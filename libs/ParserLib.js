@@ -44,7 +44,7 @@ async function parseHTMLForWeek(response, date, groupNumber) {
         let $cleaned_cours_week = [];
 
         for (const $cours of $cours_week_raw) {
-            const cours = await extractCourseDetails($, $cours);
+            const cours = await extractCourseDetails($, $cours, date);
             if (cours.groupNumber === groupNumber && cours.batiment !== undefined && parseInt(cours.heure_debut.split(":")[0]) < 18) {
                 $cleaned_cours_week.push(cours);
             }
@@ -58,8 +58,9 @@ async function parseHTMLForWeek(response, date, groupNumber) {
     }
 }
 
-async function extractCourseDetails($, $cours) {
+async function extractCourseDetails($, $cours, date) {
     const cours = {};
+    cours.date = date;
     cours.visio = false;
     cours.matiere = extractText($, $cours, 'matiere')
         .replace(/(visio|distanciel)/i, "")
@@ -83,7 +84,6 @@ async function extractCourseDetails($, $cours) {
     processRoomInfo(cours);
     cours.position = parseInt($cours.attribs.style.split("left:")[1].split("%")[0]);
     cours.jour = determineDayFromPosition(cours.position);
-    cours.date = calculateCourseDate(date, cours.jour);
     cours.dtstart = formatDateTime(cours.date, cours.heure_debut);
     cours.dtend = formatDateTime(cours.date, cours.heure_fin);
 
