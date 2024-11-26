@@ -168,7 +168,7 @@ function processSubjectsSummary(processedCourses) {
         if (!subjectsSummary[subject]) {
             subjectsSummary[subject] = createNewSubjectEntry(course, startDateTime, endDateTime, durationHours, isRealized, isVisio, session);
         } else {
-            updateSubjectEntry(subjectsSummary[subject], course, { startDateTime, endDateTime, durationHours, isRealized, isVisio }, session);
+            updateSubjectEntry(subjectsSummary[subject], course, { startDateTime, endDateTime, durationHours, isRealized, isVisio }, session, isRealized);
         }
     });
     return subjectsSummary;
@@ -210,28 +210,28 @@ function createNewSubjectEntry(course, startDateTime, endDateTime, durationHours
     };
 }
 
-function updateSubjectEntry(subjectEntry, course, dateTimes, sessionDetails) {
+function updateSubjectEntry(subjectEntry, course, dateTimes, sessionDetails, isRealized) {
     subjectEntry.sessions.total += 1;
     if (isRealized) {
         subjectEntry.sessions.realized += 1;
-        subjectEntry.hours.realized += durationHours;
+        subjectEntry.hours.realized += dateTimes.durationHours;
     } else {
         subjectEntry.sessions.planned += 1;
-        subjectEntry.hours.planned += durationHours;
+        subjectEntry.hours.planned += dateTimes.durationHours;
     }
-    subjectEntry.hours.total += durationHours;
-    if (startDateTime < subjectEntry.firstDate) {
-        subjectEntry.firstDate = startDateTime;
+    subjectEntry.hours.total += dateTimes.durationHours;
+    if (dateTimes.startDateTime < subjectEntry.firstDate) {
+        subjectEntry.firstDate = dateTimes.startDateTime;
     }
-    if (endDateTime > subjectEntry.lastDate) {
-        subjectEntry.lastDate = endDateTime;
+    if (dateTimes.endDateTime > subjectEntry.lastDate) {
+        subjectEntry.lastDate = dateTimes.endDateTime;
     }
-    if (isVisio) {
+    if (dateTimes.isVisio) {
         subjectEntry.hasVisio = true;
         subjectEntry.visioCount += 1;
     }
 
-    subjectEntry.sessions.list.push(session);
+    subjectEntry.sessions.list.push(sessionDetails);
 
     // Add unique teacher
     const teacherExists = subjectEntry.teachers.some(teacher => teacher.email === course.prof.email);
