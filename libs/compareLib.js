@@ -53,8 +53,7 @@ function normalizeCourse(course) {
         },
         salle: course.salle ? course.salle.trim() : "",
         batiment: course.batiment ? course.batiment.trim() : "",
-        visio: course.visio,
-        teamslink: course.teamslink || null
+        visio: course.visio
     };
 }
 

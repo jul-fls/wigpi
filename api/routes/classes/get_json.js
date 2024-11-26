@@ -11,10 +11,10 @@ router.get('/', (req, res) => {
     const classes = JSON.parse(json);
     const data = { classes: [] };
 
-    for(let i = 0; i < classes.length; i++){
+    for (const classItem of classes) {
         data.classes.push({
-            name: classes[i].name,
-            displayname: classes[i].displayname
+            name: classItem.name,
+            displayname: classItem.displayname
         });
     }
     

@@ -4,7 +4,7 @@ const FormData = require('form-data');
 const fs = require('fs');
 const form = new FormData();
 function edit_message(webhook_id, webhook_token, message_id, date, filename){
-    $refresh_date = new Date();
+    let $refresh_date = new Date();
     $refresh_date = ('0' + $refresh_date.getDate()).slice(-2) + "/" + ('0' + ($refresh_date.getMonth()+1)).slice(-2) + "/" + $refresh_date.getFullYear() + " à " + ('0' + $refresh_date.getHours()).slice(-2) + ":" + ('0' + $refresh_date.getMinutes()).slice(-2) + ":" + ('0' + $refresh_date.getSeconds()).slice(-2);
     // $refresh_date = date;
     form.append('payload_json', JSON.stringify({
@@ -28,16 +28,15 @@ function edit_message(webhook_id, webhook_token, message_id, date, filename){
         "username": "EDT"
     }));
     //send the request to the discord api
-    const response = fetch('https://discord.com/api/webhooks/'+webhook_id+'/'+webhook_token+'/messages/'+message_id, {
+    fetch('https://discord.com/api/webhooks/'+webhook_id+'/'+webhook_token+'/messages/'+message_id, {
         method: 'PATCH',
         body: form
     })
     .then((res) => { 
-        status1 = res.status; 
         return res.json() 
       })
     .then((response) => {
-        console.log(status1);
+        console.log(response);
     })
 }
 edit_message('1031336832379654144', 'wIxwtJZgOG-KtBq_Wo4IqbA_RYPUNrrXigXEn-69LtkFyIi7kF2jniogzVKPU_ZyE13p', '1031336902621663272', '07/11/2022', 'julien.flusin_cours.png');

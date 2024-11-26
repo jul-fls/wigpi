@@ -153,9 +153,11 @@ function refreshData(className) {
         // Add the module name
         const module_name = document.createElement("h1");
 
-        item.subject.length > 19
-          ? (module_name.className = "w-1/2 text-2xl font-bold mb-2")
-          : (module_name.className = "text-2xl font-bold mb-2");
+        if (item.subject.length > 19) {
+          module_name.className = "w-1/2 text-2xl font-bold mb-2";
+        } else {
+          module_name.className = "text-2xl font-bold mb-2";
+        }
 
         module_name.textContent = item.subject;
 
@@ -446,7 +448,7 @@ function addSessionsList(module, sessions) {
 
     if (session.isVisio) {
       const visioIconWrapper = document.createElement("span");
-      visioIconWrapper.title = "Cours en visio sans lien EDT Teams";
+      visioIconWrapper.title = "Cours en visio";
 
       const visioIcon = document.createElement("i");
       visioIcon.className = "fas fa-video text-blue-500 ml-2"; // Add ml-2 for some spacing
@@ -456,19 +458,6 @@ function addSessionsList(module, sessions) {
 
       VisioIconsDiv.appendChild(visioIcon);
 
-      if (session.teamslink) {
-        const visioTeamsLinkIcon = document.createElement("a");
-        visioTeamsLinkIcon.href = session.teamslink;
-        visioTeamsLinkIcon.className = "px-2";
-        visioTeamsLinkIcon.target = "_blank"; // Ensures the link opens in a new tab
-
-        const teamsIcon = document.createElement("img");
-        teamsIcon.src = "https://cdn.simpleicons.org/microsoftteams/6264a7ff";
-        teamsIcon.alt = "Microsoft Teams";
-        teamsIcon.className = "h-5 w-5";
-        visioTeamsLinkIcon.appendChild(teamsIcon);
-        VisioIconsDiv.appendChild(visioTeamsLinkIcon);
-      }
       visioIconWrapper.appendChild(VisioIconsDiv);
       sessionDiv.appendChild(visioIconWrapper);
     } else {
@@ -498,7 +487,7 @@ function addSessionsList(module, sessions) {
   // Add event listener to toggle the icon and visibility
   toggleButton.addEventListener("click", () => {
     sessionList.classList.toggle("hidden"); // Toggle visibility of sessionList, not sessionListContainer
-    const icon = toggleButton.querySelector("svg");
+    const icon = toggleButton.querySelector("i");
     if (sessionList.classList.contains("hidden")) {
       icon.classList.remove("fa-chevron-up");
       icon.classList.add("fa-chevron-down");

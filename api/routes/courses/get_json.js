@@ -9,13 +9,13 @@ router.get('/:class_name', (req, res) => {
     const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
     let $status = 0;
 
-    for(let i = 0; i < $classes.length; i++) {
-        if($status == 0) {
-            if($classes[i].name === class_name) {
+    for (const classItem of $classes) {
+        if ($status == 0) {
+            if (classItem.name === class_name) {
                 $status = 1;
                 const jsonFilePath = path.join(paths.output.json, `${class_name}.json`);
                 fs.readFile(jsonFilePath, 'utf8', function(err, data) {
-                    if(err) {
+                    if (err) {
                         res.send("error");
                     } else {
                         res.type('application/json');

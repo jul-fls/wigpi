@@ -20,11 +20,9 @@ COPY template.html ./
 COPY main.js ./
 COPY testcompare.js ./
 
-# Create necessary output directories
-RUN mkdir -p output/icsFiles output/jsonFiles output/pngFiles output/lockFiles output/htmlFiles logs
-
-# Install tzdata for timezone management
-RUN apk add --no-cache tzdata
+# Create necessary output directories and install tzdata for timezone management
+RUN mkdir -p output/icsFiles output/jsonFiles output/pngFiles output/lockFiles output/htmlFiles logs && \
+	apk add --no-cache tzdata
 
 # Tell Docker about the port we'll run on
 EXPOSE 3000

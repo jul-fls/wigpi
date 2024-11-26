@@ -9,9 +9,9 @@ router.get('/:class_name', (req, res) => {
     const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
     let $status = 0;
 
-    for (let i = 0; i < $classes.length; i++) {
+    for (const classItem of $classes) {
         if ($status == 0) {
-            if ($classes[i].name === class_name) {
+            if (classItem.name === class_name) {
                 $status = 1;
                 const htmlFilePath = path.join(paths.output.html, `${class_name}.html`);
                 fs.readFile(htmlFilePath, 'utf8', function(err, data) {

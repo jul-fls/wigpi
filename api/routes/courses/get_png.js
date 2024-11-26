@@ -9,9 +9,9 @@ router.get('/:class_name/:timestamp', (req, res) => {
     const $classes = JSON.parse(fs.readFileSync(path.join(paths.config, 'classes.json'), 'utf8'));
     let $status = 0;
 
-    for(let i = 0; i < $classes.length; i++) {
-        if($status == 0) {
-            if($classes[i].name === class_name) {
+    for (const classItem of $classes) {
+        if ($status == 0) {
+            if (classItem.name === class_name) {
                 $status = 1;
                 const pngFilePath = path.join(paths.output.png, `${class_name}.png`);
                 res.type('image/png');

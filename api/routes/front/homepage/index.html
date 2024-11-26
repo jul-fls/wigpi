@@ -42,34 +42,34 @@
             </div>
         </div>
         <script>
-            $json_classes = '{{classes}}';
-            ul_element = document.querySelector('ul');
-            classes = JSON.parse($json_classes);
+            let ul_element = document.querySelector('ul');
+            const $json_classes = '{{classes}}';
+            const classes = JSON.parse($json_classes);
             classes.forEach(function (classe) {
-                li_element = document.createElement('li');
+                let li_element = document.createElement('li');
                 li_element.classList.add("rounded-2xl", "shadow-2xl", "overflow-hidden", "text-gray-800", "font-sans", "hover:bg-red-600", "hover:shadow-lg", "transition", "duration-300", "backdrop-filter", "backdrop-blur-sm", "hover:backdrop-blur-md");
                 
-                a_element = document.createElement('a');
-                classe_url = document.location.origin.replace("https","webcals") + '/api/courses/get_ics/' + classe.name;
+                let a_element = document.createElement('a');
+                let classe_url = document.location.origin.replace("https","webcals") + '/api/courses/get_ics/' + classe.name;
                 a_element.setAttribute('href', classe_url);
                 a_element.setAttribute('class', 'bg-white shadow-md rounded-lg overflow-hidden text-gray-800 font-sans');
                 
-                div_element = document.createElement('div');
+                let div_element = document.createElement('div');
                 div_element.setAttribute('class', 'px-6 py-4');
                 
-                div_element2 = document.createElement('div');
+                let div_element2 = document.createElement('div');
                 div_element2.setAttribute('class', 'flex items-center mb-2 space-x-2');  // Added space between icon and name
                 
-                i_element = document.createElement('i');
+                let i_element = document.createElement('i');
                 i_element.setAttribute('class', 'fas fa-calendar-alt fa-2x');
-                colors = ['text-red-500', 'text-blue-500', 'text-green-500', 'text-yellow-500', 'text-purple-500', 'text-pink-500', 'text-indigo-500', 'text-gray-500'];
+                const colors = ['text-red-500', 'text-blue-500', 'text-green-500', 'text-yellow-500', 'text-purple-500', 'text-pink-500', 'text-indigo-500', 'text-gray-500'];
                 i_element.classList.add(colors[Math.floor(Math.random() * colors.length)]);
                 
-                h2_element = document.createElement('h2');
+                let h2_element = document.createElement('h2');
                 h2_element.setAttribute('class', 'text-xl font-bold uppercase');
                 h2_element.innerHTML = classe.name;
                 
-                p_element = document.createElement('p');
+                let p_element = document.createElement('p');
                 p_element.setAttribute('class', 'text-gray-600 text-sm mt-1');  // Ensuring the display name appears below class name
                 p_element.innerHTML = classe.displayname;
                 

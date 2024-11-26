@@ -1,21 +1,21 @@
 const fs = require('fs');
 
 function start(class_displayname) {
-    json = "{\"info\":{\n";
-    json += "\"timestamp\": \"" + Date.now() + "\",\n";
-    json += "\"classname\": \"" + class_displayname + "\",\n";
-    json += "\"description\": \"Emploi du temps des cours des " + class_displayname + "\"\n},\"courses\": [\n";
+    const json = "{\"info\":{\n" +
+    "\"timestamp\": \"" + Date.now() + "\",\n" +
+    "\"classname\": \"" + class_displayname + "\",\n" +
+    "\"description\": \"Emploi du temps des cours des " + class_displayname + "\"\n},\"courses\": [\n";
     return json;
 }
 
 function end() {
-    json = "\n]\n}";
+    const json = "\n]\n}";
     return json;
 }
 
 function write(type, data, jsonFileName) {
     if (type == "start") {
-        json = start(data);
+        const json = start(data);
         fs.writeFile(jsonFileName, json, function(err) {
             if (err) {
                 return err;
@@ -36,21 +36,16 @@ function write(type, data, jsonFileName) {
             });
         });
     } else if (type == "event") {
-        json = "{\n";
-        json += "\"uid\": \"" + data.uid + "\",\n";
-        json += "\"dtstart\": \"" + data.dtstart + "\",\n";
-        json += "\"dtend\": \"" + data.dtend + "\",\n";
-        json += "\"matiere\": \"" + data.matiere + "\",\n";
-        json += "\"prof\": {\"name\":\"" + data.prof.name + "\",\"email\":\"" + data.prof.email + "\"},\n";
-        json += "\"salle\": \"" + data.salle + "\",\n";
-        json += "\"batiment\": \"" + data.batiment + "\",\n";
-        json += "\"visio\": " + data.visio + ",\n";
-        if (data.lien_teams != undefined) {
-            json += "\"teamslink\": \"" + data.lien_teams + "\"\n";
-        } else {
-            json += "\"teamslink\": \"" + null + "\"\n";
-        }
-        json += "},\n";
+        const json = "{\n" +
+        "\"uid\": \"" + data.uid + "\",\n" +
+        "\"dtstart\": \"" + data.dtstart + "\",\n" +
+        "\"dtend\": \"" + data.dtend + "\",\n" +
+        "\"matiere\": \"" + data.matiere + "\",\n" +
+        "\"prof\": {\"name\":\"" + data.prof.name + "\",\"email\":\"" + data.prof.email + "\"},\n" +
+        "\"salle\": \"" + data.salle + "\",\n" +
+        "\"batiment\": \"" + data.batiment + "\",\n" +
+        "\"visio\": " + data.visio + ",\n" +
+        "},\n";
         fs.appendFile(jsonFileName, json, function(err) {
             if (err) {
                 return err;

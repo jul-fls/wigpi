@@ -10,16 +10,16 @@ const crypto = require('crypto');
 const path = require('path');
 const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
-$json = fs.readFileSync(path.join(paths.config, 'classes.json'));
-$classes = JSON.parse($json);
+const $json = fs.readFileSync(path.join(paths.config, 'classes.json'));
+const $classes = JSON.parse($json);
 async function getCoursForYear(year, user) {
     await cal.getCalendarForYear(year, user)
         .then((cours_of_the_year) => {
-            for (j = 0; j < cours_of_the_year.length; j++) {
-                if (cours_of_the_year[j] != undefined) {
-                    for (k = 0; k < cours_of_the_year[j].length; k++) {
-                        ics.write("event", cours_of_the_year[j][k], icsFileName);
-                        json.write("event", cours_of_the_year[j][k], jsonFileName);
+            for (const cours of cours_of_the_year) {
+                if (cours != undefined) {
+                    for (const k of cours) {
+                        ics.write("event", k, icsFileName);
+                        json.write("event", k, jsonFileName);
                     }
                 }
             }
@@ -27,16 +27,17 @@ async function getCoursForYear(year, user) {
 }
 
 async function getCoursForClass(user, classname, displayname) {
-    icsFileName = path.join(paths.output.ics, `${classname}.ics.tmp`);
-    jsonFileName = path.join(paths.output.json, `${classname}.json.tmp`);
+    const icsFileName = path.join(paths.output.ics, `${classname}.ics.tmp`);
+    const jsonFileName = path.join(paths.output.json, `${classname}.json.tmp`);
     const now = new Date();
     // if now is after or the 1st of september and before the 1st of january, the actual year is the current year, and if now is after or the 1st of january and before the 1st of september, the actual year is the current year - 1
+    let actualYear;
     if (now.getMonth() >= 8) {
         actualYear = now.getFullYear();
     } else {
         actualYear = now.getFullYear() - 1;
     }
-    nextYear = actualYear + 1;
+    const nextYear = actualYear + 1;
     ics.write("start", displayname, icsFileName);
     json.write("start", displayname, jsonFileName);
 
@@ -69,46 +70,41 @@ async function getCoursForClass(user, classname, displayname) {
     // Ensure temp files are properly renamed
     const $icsFiles = fs.readdirSync(paths.output.ics);
     const $jsonFiles = fs.readdirSync(paths.output.json);
-    for (let i = 0; i < $icsFiles.length; i++) {
-        if ($icsFiles[i].includes(".tmp")) {
-            await fs.rename(
-                path.join(paths.output.ics, $icsFiles[i]),
-                path.join(paths.output.ics, $icsFiles[i].replace(".tmp", "")),
-                (err) => {
-                    if (err) throw err;
-                    console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
-                }
+    for (const file of $icsFiles) {
+        if (file.includes(".tmp")) {
+            await fs.promises.rename(
+                path.join(paths.output.ics, file),
+                path.join(paths.output.ics, file.replace(".tmp", ""))
             );
+            console.log("Done writing ics file for class " + file.replace(".tmp", ""));
         }
     }
-    for (let i = 0; i < $jsonFiles.length; i++) {
-        if ($jsonFiles[i].includes(".tmp")) {
-            await fs.rename(
-                path.join(paths.output.json, $jsonFiles[i]),
-                path.join(paths.output.json, $jsonFiles[i].replace(".tmp", "")),
-                (err) => {
-                    if (err) throw err;
-                    console.log("Done writing json file for class " + $jsonFiles[i].replace(".tmp", ""));
-                }
+    for (const file of $jsonFiles) {
+        if (file.includes(".tmp")) {
+            const newFileName = file.replace(".tmp", "");
+            await fs.promises.rename(
+                path.join(paths.output.json, file),
+                path.join(paths.output.json, newFileName)
             );
+            console.log("Done writing json file for class " + newFileName);
         }
     }
 }
 
 async function getCoursForAllClasses() {
-    for (let i = 0; i < $classes.length; i++) {
-        $date = new Date();
-        $date_str = ('0' + $date.getDate()).slice(-2) + "/" + ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + $date.getFullYear() + " " + ('0' + $date.getHours()).slice(-2) + ":" + ('0' + $date.getMinutes()).slice(-2) + ":" + ('0' + $date.getSeconds()).slice(-2);
-        console.log("[LOG CREATE ICS][" + $date_str + "] Début de la classe " + $classes[i].name);
-        console.log("[LOG CREATE JSON][" + $date_str + "] Début de la classe " + $classes[i].name);
+    for (const classItem of $classes) {
+        let $date = new Date();
+        let $date_str = ('0' + $date.getDate()).slice(-2) + "/" + ('0' + ($date.getMonth() + 1)).slice(-2) + "/" + $date.getFullYear() + " " + ('0' + $date.getHours()).slice(-2) + ":" + ('0' + $date.getMinutes()).slice(-2) + ":" + ('0' + $date.getSeconds()).slice(-2);
+        console.log("[LOG CREATE ICS][" + $date_str + "] Début de la classe " + classItem.name);
+        console.log("[LOG CREATE JSON][" + $date_str + "] Début de la classe " + classItem.name);
         
-        await getCoursForClass($classes[i].user, $classes[i].name, $classes[i].displayname)
+        await getCoursForClass(classItem.user, classItem.name, classItem.displayname)
             .then(() => {
-                console.log("Fini pour la classe " + $classes[i].name);
+                console.log("Fini pour la classe " + classItem.name);
             });
         
-        console.log("[LOG CREATE ICS][" + $date_str + "] Fin de la classe " + $classes[i].name);
-        console.log("[LOG CREATE JSON][" + $date_str + "] Fin de la classe " + $classes[i].name);
+        console.log("[LOG CREATE ICS][" + $date_str + "] Fin de la classe " + classItem.name);
+        console.log("[LOG CREATE JSON][" + $date_str + "] Fin de la classe " + classItem.name);
     }
 
     // sleep for 10 seconds
@@ -118,21 +114,21 @@ async function getCoursForAllClasses() {
     const $icsFiles = fs.readdirSync(paths.output.ics);
     const $jsonFiles = fs.readdirSync(paths.output.json);
 
-    for (let i = 0; i < $icsFiles.length; i++) {
-        if ($icsFiles[i].includes(".tmp")) {
+    for (const file of $icsFiles) {
+        if (file.includes(".tmp")) {
             await fs.promises.rename(
-                path.join(paths.output.ics, $icsFiles[i]),
-                path.join(paths.output.ics, $icsFiles[i].replace(".tmp", ""))
+                path.join(paths.output.ics, file),
+                path.join(paths.output.ics, file.replace(".tmp", ""))
             );
-            console.log("Done writing ics file for class " + $icsFiles[i].replace(".tmp", ""));
+            console.log("Done writing ics file for class " + file.replace(".tmp", ""));
         }
     }
 
-    for (let i = 0; i < $jsonFiles.length; i++) {
-        if ($jsonFiles[i].includes(".tmp")) {
-            const newFileName = $jsonFiles[i].replace(".tmp", "");
+    for (const file of $jsonFiles) {
+        if (file.includes(".tmp")) {
+            const newFileName = file.replace(".tmp", "");
             await fs.promises.rename(
-                path.join(paths.output.json, $jsonFiles[i]),
+                path.join(paths.output.json, file),
                 path.join(paths.output.json, newFileName)
             );
             console.log("Done writing json file for class " + newFileName);
@@ -158,7 +154,6 @@ function createFakeCoursMaintenances() {
             salle: "Erreur",
             batiment: "Erreur",
             visio: false,
-            teamslink: "",
             description: "",
             uid: crypto.createHash('md5').update(dateStr + "080000" + "090000" + "Erreur" + "Erreur" + "Erreur" + "Erreur").digest("hex")
         }, icsFileName);
@@ -170,7 +165,6 @@ function createFakeCoursMaintenances() {
             salle: "Erreur",
             batiment: "Erreur",
             visio: false,
-            teamslink: "",
             description: ""
         }, jsonFileName);
     }
