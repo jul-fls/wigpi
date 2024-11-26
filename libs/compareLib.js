@@ -24,7 +24,6 @@ async function sendDiscordMessage(content) {
 
 function isFutureCourse(course) {
     const now = new Date();
-
     const courseStartDate = parseCourseDate(course.dtstart);
 
     // Check if the course is in the future (start date is after or equal to now)
@@ -100,12 +99,18 @@ function parseCourseDate(dateStr) {
     return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
 }
 
-
 // Function to detect differences between old and new course data
 function detectDifferences(oldCourses, newCourses) {
     let added = [];
     let removed = [];
     let modified = [];
+
+    // Find removed courses
+    Object.keys(oldCourses).forEach(uid => {
+        if (!newCourses[uid]) {
+            removed.push(oldCourses[uid]); // Course removed
+        }
+    });
 
     // Compare new courses
     Object.keys(newCourses).forEach(uid => {
@@ -120,13 +125,6 @@ function detectDifferences(oldCourses, newCourses) {
                     differences: detailedDifferences
                 }); // Course modified
             }
-        }
-    });
-
-    // Find removed courses
-    Object.keys(oldCourses).forEach(uid => {
-        if (!newCourses[uid]) {
-            removed.push(oldCourses[uid]); // Course removed
         }
     });
 
