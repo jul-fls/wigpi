@@ -61,16 +61,16 @@
                 div_element2.classList.add('flex','items-center','justify-center','mb-2','space-x-2');  // Added space between icon and name
                 
                 let i_element = document.createElement('i');
-                i_element.classList.add('fas fa-calendar-alt','fa-2x');
+                i_element.classList.add('fas','fa-calendar-alt','fa-2x');
                 const colors = ['text-red-500', 'text-blue-500', 'text-green-500', 'text-yellow-500', 'text-purple-500', 'text-pink-500', 'text-indigo-500', 'text-gray-500'];
                 i_element.classList.add(colors[Math.floor(Math.random() * colors.length)]);
                 
                 let h2_element = document.createElement('h2');
-                h2_element.classList.add('text-xl','font-bold uppercase');
+                h2_element.classList.add('text-xl','font-bold','uppercase');
                 h2_element.innerHTML = classe.name;
                 
                 let p_element = document.createElement('p');
-                p_element.classList.add('text-gray-600','text-sm mt-1');  // Ensuring the display name appears below class name
+                p_element.classList.add('text-gray-600','text-sm','mt-1');  // Ensuring the display name appears below class name
                 p_element.innerHTML = classe.displayname;
                 
                 div_element2.appendChild(i_element);
