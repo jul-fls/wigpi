@@ -12,7 +12,8 @@ const fetch = (...args) =>
     import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const $json = fs.readFileSync(path.join(paths.config, 'classes.json'));
 const $classes = JSON.parse($json);
-async function getCoursForYear(year, user) {
+
+async function getCoursForYear(year, user, icsFileName, jsonFileName) {
     await cal.getCalendarForYear(year, user)
         .then((cours_of_the_year) => {
             for (const cours of cours_of_the_year) {
@@ -25,6 +26,7 @@ async function getCoursForYear(year, user) {
             }
         });
 }
+
 
 async function getCoursForClass(user, classname, displayname) {
     const icsFileName = path.join(paths.output.ics, `${classname}.ics.tmp`);
@@ -51,12 +53,12 @@ async function getCoursForClass(user, classname, displayname) {
         return;
     }
 
-    await getCoursForYear(actualYear, user)
-        .then(() => {
-            console.log("Done with year " + actualYear);
-        });
+    await getCoursForYear(actualYear, user, icsFileName, jsonFileName)
+    .then(() => {
+        console.log("Done with year " + actualYear);
+    });
 
-    await getCoursForYear(nextYear, user)
+    await getCoursForYear(nextYear, user, icsFileName, jsonFileName)
         .then(() => {
             console.log("Done with year " + nextYear);
         })
