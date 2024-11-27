@@ -44,7 +44,7 @@ function write(type, data, jsonFileName) {
         "\"prof\": {\"name\":\"" + data.prof.name + "\",\"email\":\"" + data.prof.email + "\"},\n" +
         "\"salle\": \"" + data.salle + "\",\n" +
         "\"batiment\": \"" + data.batiment + "\",\n" +
-        "\"visio\": " + data.visio + ",\n" +
+        "\"visio\": " + data.visio + "\n" +
         "},\n";
         fs.appendFile(jsonFileName, json, function(err) {
             if (err) {
