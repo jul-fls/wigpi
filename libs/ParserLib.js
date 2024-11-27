@@ -5,7 +5,7 @@ const cheerio = require('cheerio');
 const crypto = require('crypto');
 const miscLib = require('./miscLib');
 
-//create uid for each cours based on matiere and date
+// Create UID for each course based on subject (matiere) and date
 function generateUniqueIdForWeek(courses) {
     let courseOccurrencesByDate = {};
 
@@ -50,9 +50,14 @@ async function parseHTMLForWeek(response, date, groupNumber) {
             }
         }
 
+        // Merge consecutive courses
         mergeConsecutiveCourses($cleaned_cours_week);
-        $cleaned_cours_week.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Generate unique IDs for courses
         generateUniqueIdForWeek($cleaned_cours_week);
+
+        // Sort courses by date
+        $cleaned_cours_week.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         return $cleaned_cours_week;
     }
@@ -60,8 +65,10 @@ async function parseHTMLForWeek(response, date, groupNumber) {
 
 async function extractCourseDetails($, $cours, date) {
     const cours = {};
-    cours.date = date;
+    cours.date = formatDate(date);
     cours.visio = false;
+
+    // Extract course details
     cours.matiere = extractText($, $cours, 'matiere')
         .replace(/(visio|distanciel)/i, "")
         .trim()
@@ -81,7 +88,9 @@ async function extractCourseDetails($, $cours, date) {
     cours.heure_debut = cours.horaires.split(" - ")[0];
     cours.heure_fin = cours.horaires.split(" - ")[1];
 
+    // Process room info
     processRoomInfo(cours);
+
     cours.position = parseInt($cours.attribs.style.split("left:")[1].split("%")[0]);
     cours.jour = determineDayFromPosition(cours.position);
     cours.dtstart = formatDateTime(cours.date, cours.heure_debut);
@@ -90,98 +99,27 @@ async function extractCourseDetails($, $cours, date) {
     return cours;
 }
 
-function extractText($, $cours, type) {
-    switch (type) {
-        case 'matiere':
-            return $($cours.children[0].children[1].children[0].children[0].children[0].children[0]).text().replace(/(\r\n|\n|\r)/gm, " ");
-        case 'salle':
-            return $($cours.children[0].children[1].children[0].children[0].children[2].children[1]).text();
-        case 'annee':
-            return $($cours.children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
-        case 'horaires':
-            return $($cours.children[0].children[1].children[0].children[0].children[2].children[0]).text();
-        default:
-            return "";
-    }
-}
-
-async function extractProfDetails($, $cours) {
-    let profName = $($cours.children[0].children[1].children[0].children[0].children[1].children[0])
-        .html().split("</span>")[1]
-        .split("<br>")[0]
-        .replace(/(\r\n|\n|\r)/gm, " ")
-        .replace(/\w\S*/g, function(txt) {
-            return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
-        })
-        .replace(/epsi/gi, "")
-        .trim();
-
-    return {
-        name: profName,
-        email: profName !== "" ? await miscLib.EpsiNameToEmail(profName) : ""
-    };
-}
-
-function extractGroupNumber($, $cours) {
-    const text = $($cours.children[0].children[1].children[0].children[0].children[1].children[0]).html();
-    const afterSpan = text.split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
-    const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-
-    const transversalesIndex = cleanedText.indexOf("Transversales");
-    if (transversalesIndex !== -1) {
-        const match = /Transversales(\d)/.exec(cleanedText.substring(transversalesIndex));
-        return match ? match[1] : "0";
-    }
-    return "0";
-}
-
-function processRoomInfo(cours) {
-    if (!cours.salle) return;
-
-    const salleParts = cours.salle.split("(");
-    if (salleParts.length > 1) {
-        const batimentParts = salleParts[1].split(")");
-        if (batimentParts.length > 0) {
-            cours.batiment = batimentParts[0];
-            if (cours.batiment === "DISTANCIEL") {
-                cours.visio = true;
-                cours.batiment = "VISIO";
-                cours.salle = "VISIO";
-            }
-        }
-    }
-    cours.salle = salleParts[0].trim();
-    // Handle multiple rooms or different building prefixes
-    // ... (similar to original processing logic)
-}
-
-function determineDayFromPosition(position) {
-    switch (true) {
-        case position >= parseInt(process.env.MONDAY_LEFT) && position < parseInt(process.env.TUESDAY_LEFT):
-            return 0;
-        case position >= parseInt(process.env.TUESDAY_LEFT) && position < parseInt(process.env.WEDNESDAY_LEFT):
-            return 1;
-        case position >= parseInt(process.env.WEDNESDAY_LEFT) && position < parseInt(process.env.THURSDAY_LEFT):
-            return 2;
-        case position >= parseInt(process.env.THURSDAY_LEFT) && position < parseInt(process.env.FRIDAY_LEFT):
-            return 3;
-        case position >= parseInt(process.env.FRIDAY_LEFT):
-            return 4;
-        default:
-            console.log("Erreur de position, valeur inconnue : " + position);
-            return -1;
-    }
-}
-
-function calculateCourseDate(baseDate, dayOffset) {
-    const date = new Date(baseDate);
-    date.setDate(date.getDate() + dayOffset);
-    return date.toLocaleDateString("fr-FR", { day: '2-digit', month: '2-digit', year: 'numeric' });
+function formatDate(date) {
+    const parsedDate = new Date(date);
+    return parsedDate.toLocaleDateString("fr-FR", { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function formatDateTime(date, time) {
     const [day, month, year] = date.split("/");
-    return `${year}${month}${day}T${time.replace(":", "") + "00"}`;
+    const [hours, minutes] = time.split(":");
+
+    if (!day || !month || !year || !hours || !minutes) {
+        console.error("Invalid date or time values:", { date, time });
+        return null;
+    }
+
+    const dateTime = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+    if (isNaN(dateTime.getTime())) {
+        console.error("Invalid constructed date:", dateTime);
+        return null;
+    }
+
+    return dateTime.toISOString().replace(/-|:|\.\d{3}/g, "").slice(0, 15); // "YYYYMMDDTHHmmss"
 }
 
 function mergeConsecutiveCourses(courses) {
