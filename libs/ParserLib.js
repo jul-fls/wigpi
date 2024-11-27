@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require('crypto');
-const urlLib = require('./urlLib.js');
 const miscLib = require('./miscLib');
 
 //create uid for each cours based on matiere and date
