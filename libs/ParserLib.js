@@ -47,7 +47,7 @@ async function parseHTMLForWeek(response, date, groupNumber) {
         const $cours_week_raw = $(".Case:not([id])");
         let $cours_week = $cours_week_raw.toArray();
         let $cleaned_cours_week = [];
-        for (const $cours of $cours_week) {
+        for (let $i = 0; $i < $cours_week.length; $i++) {
             let cours = [];
             cours.visio = false;
             cours.matiere = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0]).text().replace(/(\r\n|\n|\r)/gm, " ");
@@ -61,7 +61,7 @@ async function parseHTMLForWeek(response, date, groupNumber) {
                 email: ""
             };
             cours.prof.name = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[0].replace(/(\r\n|\n|\r)/gm, " ").replace(/\w\S*/g, function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             });
             cours.prof.name = cours.prof.name.replace(/epsi/gi, "").trim();
             if (cours.prof.name != "") {
@@ -70,14 +70,13 @@ async function parseHTMLForWeek(response, date, groupNumber) {
             cours.groupNumber = (() => {
                 const text = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html();
                 const afterSpan = text.split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
-                const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+                const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
             
                 // Check if the string contains "transversales"
                 const transversalesIndex = cleanedText.indexOf("Transversales");
                 if (transversalesIndex !== -1) {
                     // Extract the number right after "transversales"
-                    const regex = /Transversales(\d)/;
-                    const match = regex.exec(cleanedText.substring(transversalesIndex));
+                    const match = cleanedText.substring(transversalesIndex).match(/Transversales(\d)/);
                     return match ? match[1] : "0";
                 } else {
                     return "0";
