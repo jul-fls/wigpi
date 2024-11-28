@@ -148,20 +148,34 @@ async function parseHTMLForWeek(response, date, groupNumber) {
 
 // Utility: Combine adjacent courses
 function combineAdjacentCourses(courses) {
-    for (let i = 0; i < courses.length - 1; i++) {
+    const mergedCourses = [];
+
+    for (let i = 0; i < courses.length; i++) {
         const curr = courses[i];
-        const next = courses[i + 1];
-        if (curr.heure_fin === next.heure_debut && curr.salle === next.salle &&
-            curr.prof.name === next.prof.name && curr.visio === next.visio &&
-            curr.batiment === next.batiment) {
+
+        // Check if the current course can be merged with the next one
+        while (
+            i + 1 < courses.length &&
+            curr.heure_fin === courses[i + 1].heure_debut &&
+            curr.salle === courses[i + 1].salle &&
+            curr.prof.name === courses[i + 1].prof.name &&
+            curr.visio === courses[i + 1].visio &&
+            curr.batiment === courses[i + 1].batiment
+        ) {
+            // Merge the next course into the current one
+            const next = courses[i + 1];
             curr.heure_fin = next.heure_fin;
             curr.horaires = `${curr.heure_debut} - ${curr.heure_fin}`;
             curr.dtend = next.dtend;
-            courses.splice(i + 1, 1);
-            i--;
+
+            // Skip the merged course
+            i++;
         }
+
+        mergedCourses.push(curr);
     }
-    return courses;
+
+    return mergedCourses;
 }
 
 // Utility: Filter courses based on conditions
