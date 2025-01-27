@@ -38,6 +38,121 @@ function generateUniqueIdForWeek(courses) {
     });
 }
 
+function processRoomInformation(cours) {
+    const salleParts = cours.salle.split("(");
+    if (salleParts.length > 1) {
+        const batimentParts = salleParts[1].split(")");
+        if (batimentParts.length > 0) {
+            cours.batiment = batimentParts[0];
+            if (cours.batiment === "DISTANCIEL") {
+                cours.visio = true;
+                cours.batiment = "VISIO";
+                cours.salle = "VISIO";
+            }
+        }
+    }
+
+    cours.salle = salleParts[0].trim();
+
+    if (cours.salle.startsWith("M")) {
+        let multiSalles = cours.salle.replace("M: ", "").split(", ");
+        let firstBatiment = null;
+
+        multiSalles = multiSalles.map((salle) => {
+            let parsedSalle = salle.trim();
+            if (parsedSalle.startsWith("F")) {
+                let etage = parseInt(parsedSalle[1]);
+                parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
+                if (!firstBatiment) firstBatiment = "Faure";
+            } else if (parsedSalle.startsWith("B")) {
+                let etage = parseInt(parsedSalle[1]) + 1;
+                parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
+                if (!firstBatiment) firstBatiment = "Bruges";
+            }
+            return parsedSalle;
+        });
+
+        multiSalles.sort();
+        cours.salle = multiSalles.join(", ");
+        cours.batiment = firstBatiment;
+    } else if (cours.salle.startsWith("F")) {
+        let etage = parseInt(cours.salle[1]);
+        cours.salle = `Etage ${etage} Salle ${cours.salle.slice(2).trim()}`;
+        cours.batiment = "Faure";
+    } else if (cours.salle.startsWith("B")) {
+        let etage = parseInt(cours.salle[1]) + 1;
+        cours.salle = `Etage ${etage} Salle ${cours.salle.slice(2).trim()}`;
+        cours.batiment = "Bruges";
+    } else if (cours.salle.includes("SALLE_")) {
+        cours.salle = "VISIO";
+    }
+    cours.salle = cours.salle.replaceAll("_", "");
+}
+
+function calculateDayFromPosition(position) {
+    switch (true) {
+        case position >= parseInt(process.env.MONDAY_LEFT) && position < parseInt(process.env.TUESDAY_LEFT):
+            return 0;
+        case position >= parseInt(process.env.TUESDAY_LEFT) && position < parseInt(process.env.WEDNESDAY_LEFT):
+            return 1;
+        case position >= parseInt(process.env.WEDNESDAY_LEFT) && position < parseInt(process.env.THURSDAY_LEFT):
+            return 2;
+        case position >= parseInt(process.env.THURSDAY_LEFT) && position < parseInt(process.env.FRIDAY_LEFT):
+            return 3;
+        case position >= parseInt(process.env.FRIDAY_LEFT):
+            return 4;
+        default:
+            console.log("Erreur de position, valeur inconnue : " + position);
+            return -1;
+    }
+}
+
+function formatName(name) {
+    return name.replace(/(\r\n|\n|\r)/gm, " ")
+               .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+               .replace(/epsi/gi, "")
+               .trim();
+}
+
+function filterCourses(courses) {
+    return courses.filter(cours => {
+        return parseInt(cours.heure_debut.split(":")[0]) < 18 && cours.batiment !== undefined;
+    });
+}
+
+function mergeConsecutiveCourses(courses) {
+    for (let i = 0; i < courses.length - 1; i++) {
+        if (courses[i].heure_fin == courses[i + 1].heure_debut &&
+            courses[i].salle == courses[i + 1].salle &&
+            courses[i].prof.name == courses[i + 1].prof.name &&
+            courses[i].visio == courses[i + 1].visio &&
+            courses[i].batiment == courses[i + 1].batiment) {
+            courses[i].heure_fin = courses[i + 1].heure_fin;
+            courses[i].horaires = courses[i].heure_debut + " - " + courses[i].heure_fin;
+            courses[i].dtend = courses[i + 1].dtend;
+            courses.splice(i + 1, 1);
+            i--;
+        }
+    }
+    return courses;
+}
+
+function extractGroupNumber(htmlText) {
+    // Extract the text after </span> and clean it
+    const afterSpan = htmlText.split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
+    const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
+    // Check if the string contains "Transversales" and extract the number
+    const transversalesIndex = cleanedText.indexOf("Transversales");
+    if (transversalesIndex !== -1) {
+        const match = cleanedText.substring(transversalesIndex).match(/Transversales(\d)/);
+        return match ? match[1] : "0";
+    }
+
+    // Default to "0" if no match is found
+    return "0";
+}
+
 async function parseHTMLForWeek(response, date, groupNumber) {
     const $ = cheerio.load(response);
     if ($('body').text().includes(process.env.WIGOR_NO_COURSE_TEXT)) {
@@ -50,124 +165,33 @@ async function parseHTMLForWeek(response, date, groupNumber) {
         for (let $i = 0; $i < $cours_week.length; $i++) {
             let cours = [];
             cours.visio = false;
-            cours.matiere = $($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0]).text().replace(/(\r\n|\n|\r)/gm, " ");
+            cours.matiere = formatName($($cours_week[$i].children[0].children[1].children[0].children[0].children[0].children[0]).text());
             cours.salle = $($cours_week[$i].children[0].children[1].children[0].children[0].children[2].children[1]).text().replace("Salle:", "");
             if (cours.salle.includes("DISTANCIEL")) {
                 cours.visio = true;
             }
-            cours.matiere = cours.matiere.toLowerCase().replace("visio", "").replace("distanciel", "").trim().replace(/^./, char => char.toUpperCase()).replaceAll(".", "").replaceAll(",", " ");
+            cours.matiere = formatName(cours.matiere.toLowerCase().replace("visio", "").replace("distanciel", "").trim().replace(/^./, char => char.toUpperCase()).replaceAll(".", "").replaceAll(",", " "));
             cours.prof = {
                 name: "",
                 email: ""
             };
             cours.prof.name = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[0].replace(/(\r\n|\n|\r)/gm, " ").replace(/\w\S*/g, function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                return formatName(txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
             });
             cours.prof.name = cours.prof.name.replace(/epsi/gi, "").trim();
             if (cours.prof.name != "") {
                 cours.prof.email = await miscLib.EpsiNameToEmail(cours.prof.name);
             }
-            cours.groupNumber = (() => {
-                const text = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html();
-                const afterSpan = text.split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
-                const cleanedText = afterSpan.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-            
-                // Check if the string contains "transversales"
-                const transversalesIndex = cleanedText.indexOf("Transversales");
-                if (transversalesIndex !== -1) {
-                    // Extract the number right after "transversales"
-                    const match = cleanedText.substring(transversalesIndex).match(/Transversales(\d)/);
-                    return match ? match[1] : "0";
-                } else {
-                    return "0";
-                }
-            })();
+            cours.groupNumber = extractGroupNumber(
+                $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html()
+            );
             cours.annee = $($cours_week[$i].children[0].children[1].children[0].children[0].children[1].children[0]).html().split("</span>")[1].split("<br>")[1].replace(/(\r\n|\n|\r)/gm, " ");
             cours.horaires = $($cours_week[$i].children[0].children[1].children[0].children[0].children[2].children[0]).text();
             cours.heure_debut = cours.horaires.split(" - ")[0];
             cours.heure_fin = cours.horaires.split(" - ")[1];
-            cours.salle = $($cours_week[$i].children[0].children[1].children[0].children[0].children[2].children[1]).text().replace("Salle:", "");
-            
-            // Process the room information
-            if (cours.salle) {
-                const salleParts = cours.salle.split("(");
-                if (salleParts.length > 1) {
-                    const batimentParts = salleParts[1].split(")");
-                    if (batimentParts.length > 0) {
-                        cours.batiment = batimentParts[0];
-                        if (cours.batiment === "DISTANCIEL") {
-                            cours.visio = true;
-                            cours.batiment = "VISIO";
-                            cours.salle = "VISIO";
-                        }
-                    }
-                }
-
-                cours.salle = salleParts[0].trim();
-                
-                // Check if salle starts with "M:" and handle multiple rooms
-                if (cours.salle.startsWith("M")) {
-                    let multiSalles = cours.salle.replace("M: ", "").split(", ");
-                    let firstBatiment = null;
-
-                    multiSalles = multiSalles.map((salle) => {
-                        let parsedSalle = salle.trim();
-
-                        if (parsedSalle.startsWith("F")) {
-                            let etage = parseInt(parsedSalle[1]);
-                            parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
-                            if (!firstBatiment) firstBatiment = "Faure";
-                        } else if (parsedSalle.startsWith("B")) {
-                            let etage = parseInt(parsedSalle[1])+1;
-                            parsedSalle = `Etage ${etage} Salle ${parsedSalle.slice(2).trim()}`;
-                            if (!firstBatiment) firstBatiment = "Bruges";
-                        }
-
-                        return parsedSalle;
-                    });
-
-                    multiSalles.sort(); // Sort by batiment alphabetically
-                    cours.salle = multiSalles.join(", ");
-                    cours.batiment = firstBatiment; // Only consider the first batiment
-                } else if (cours.salle.startsWith("F")) {
-                    // Process Faure building
-                    cours.salle = cours.salle.replace("F", "");
-                    let etage = parseInt(cours.salle[0]);
-                    cours.salle = `Etage ${etage} Salle ${cours.salle.slice(1).trim()}`;
-                    cours.batiment = "Faure";
-                } else if (cours.salle.startsWith("B")) {
-                    // Process Bruges building
-                    cours.salle = cours.salle.replace("B", "");
-                    let etage = parseInt(cours.salle[0])+1;
-                    cours.salle = `Etage ${etage} Salle ${cours.salle.slice(1).trim()}`;
-                    cours.batiment = "Bruges";
-                } else if (cours.salle.includes("SALLE_")) {
-                    cours.salle = "VISIO";
-                }
-                cours.salle = cours.salle.replaceAll("_", "");
-            }
-            
+            processRoomInformation(cours)
             cours.position = parseInt($cours_week[$i].attribs.style.split("left:")[1].split("%")[0]);
-            switch (true) {
-                case cours.position >= parseInt(process.env.MONDAY_LEFT) && cours.position < parseInt(process.env.TUESDAY_LEFT):
-                    cours.jour = 0;
-                    break;
-                case cours.position >= parseInt(process.env.TUESDAY_LEFT) && cours.position < parseInt(process.env.WEDNESDAY_LEFT):
-                    cours.jour = 1;
-                    break;
-                case cours.position >= parseInt(process.env.WEDNESDAY_LEFT) && cours.position < parseInt(process.env.THURSDAY_LEFT):
-                    cours.jour = 2;
-                    break;
-                case cours.position >= parseInt(process.env.THURSDAY_LEFT) && cours.position < parseInt(process.env.FRIDAY_LEFT):
-                    cours.jour = 3;
-                    break;
-                case cours.position >= parseInt(process.env.FRIDAY_LEFT):
-                    cours.jour = 4;
-                    break;
-                default:
-                    console.log("Erreur de position, valeur inconnue : " + cours.position);
-                    break;
-            }
+            cours.jour = calculateDayFromPosition(cours.position);
             cours.date = new Date(date);
             cours.date.setDate(cours.date.getDate() + cours.jour);
             cours.date = cours.date.toLocaleDateString("fr-FR");
@@ -186,25 +210,10 @@ async function parseHTMLForWeek(response, date, groupNumber) {
         $cleaned_cours_week.sort(function(a, b) {
             return new Date(a.date) - new Date(b.date);
         });
-        for (let $i = 0; $i < $cleaned_cours_week.length; $i++) {
-            if ($i + 1 < $cleaned_cours_week.length) {
-                if ($cleaned_cours_week[$i].heure_fin == $cleaned_cours_week[$i + 1].heure_debut && $cleaned_cours_week[$i].salle == $cleaned_cours_week[$i + 1].salle && $cleaned_cours_week[$i].prof.name == $cleaned_cours_week[$i + 1].prof.name && $cleaned_cours_week[$i].viso == $cleaned_cours_week[$i + 1].viso && $cleaned_cours_week[$i].batiment == $cleaned_cours_week[$i + 1].batiment) {
-                    $cleaned_cours_week[$i].heure_fin = $cleaned_cours_week[$i + 1].heure_fin;
-                    $cleaned_cours_week[$i].horaires = $cleaned_cours_week[$i].heure_debut + " - " + $cleaned_cours_week[$i].heure_fin;
-                    $cleaned_cours_week[$i].dtend = $cleaned_cours_week[$i + 1].dtend;
-                    $cleaned_cours_week.splice($i + 1, 1);
-                }
-            }
-        }
-        // Remove all the courses that start at 18:00 or later
-        $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
-            return parseInt(cours.heure_debut.split(":")[0]) < 18;
-        });
 
-        // Ignorer les cours sans bâtiment défini
-        $cleaned_cours_week = $cleaned_cours_week.filter(function(cours) {
-            return cours.batiment !== undefined;
-        });
+        $cleaned_cours_week = mergeConsecutiveCourses($cleaned_cours_week);
+
+        $cleaned_cours_week = filterCourses($cleaned_cours_week);
 
         generateUniqueIdForWeek($cleaned_cours_week);
 
