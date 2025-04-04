@@ -45,8 +45,9 @@ function filterAndRenameCourses(courses) {
     processedCourses.sort((a, b) => parseDateTime(a.dtstart) - parseDateTime(b.dtstart));
 
     // Define the 1st of September of the current year
-    const currentYear = new Date().getFullYear();
-    const firstOfSeptember = new Date(`${currentYear}-09-01T00:00:00+02:00`); // +02:00 for Europe/Paris timezone during summer
+    const now = new Date();
+    const referenceYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+    const firstOfSeptember = new Date(`${referenceYear}-09-01T00:00:00+02:00`);
 
     // Find the first course that occurs on or after the 1st of September
     const septemberStartIndex = processedCourses.findIndex(course => {
